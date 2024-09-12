@@ -1,3 +1,4 @@
+from math import ceil
 import os
 import random
 import sys
@@ -15,14 +16,22 @@ pygame.display.set_caption("My Pygame Window")
 
 WINDOW_SIZE = (600, 400)
 TILE_SIZE = 16
+CHUNK_SIZE = 8  # visible tiles is a 8x8 grid
 
 screen = pygame.display.set_mode(WINDOW_SIZE, 0, 32)
 display = pygame.Surface((300, 200))
+
+VISIBLE_TILES_Y = ceil(display.get_height() / (CHUNK_SIZE * TILE_SIZE))
+VISIBLE_TILES_X = ceil(display.get_width() / (CHUNK_SIZE * TILE_SIZE))
 
 clock = pygame.time.Clock()
 
 grass_image = pygame.image.load("grass.png").convert()
 dirt_image = pygame.image.load("dirt.png").convert()
+plant_image = pygame.image.load("plant.png").convert()
+plant_image.set_colorkey((255, 255, 255))
+
+tile_index = {1: grass_image, 2: dirt_image, 3: plant_image}
 
 
 def collision_test(rect: pygame.Rect, tiles: list[pygame.Rect]):
@@ -75,19 +84,28 @@ air_timer = 0
 # when drawing on screen to avoing overlapping pixels
 true_scroll = [0.0, 0.0]
 
-
-def load_map(path):
-    with open(path + ".txt", "r") as f:
-        data = f.read()
-    data = data.split("\n")
-    game_map = []
-    for row in data:
-        game_map.append(list(row))
-    return game_map
-
-
 global animation_frames
 animation_frames: dict[str, pygame.Surface] = {}
+
+
+# generate the visible tiles on the fly
+def generate_chunk(x: int, y: int):
+    chunk_data: list[tuple[list[int], int]] = []
+    for y_pos in range(CHUNK_SIZE):
+        for x_pos in range(CHUNK_SIZE):
+            target_x = x * CHUNK_SIZE + x_pos
+            target_y = y * CHUNK_SIZE + y_pos
+            tile_type = 0  # nothing
+            if target_y > 10:
+                tile_type = 2  # dirt
+            elif target_y == 10:
+                tile_type = 1  # grass
+            elif target_y == 9:
+                if random.randint(1, 5) == 1:
+                    tile_type = 3  # plant
+            if tile_type != 0:
+                chunk_data.append(([target_x, target_y], tile_type))
+    return chunk_data
 
 
 def load_animation(path: str, frame_durations: list[int]):
@@ -137,7 +155,8 @@ player_action = "idle"
 player_frame = 0
 player_flip = False
 
-game_map = load_map("map")
+# the map is generated as needed
+game_map: dict[str, list[tuple[list[int], int]]] = {}
 
 grass_sound_timer = 0
 
@@ -182,16 +201,25 @@ while True:
         else:
             pygame.draw.rect(display, (9, 91, 85), obj_rect)
 
-    tile_rects = []
-    for y, row in enumerate(game_map):
-        for x, tile in enumerate(row):
-            if tile == "1":
-                display.blit(dirt_image, (x * TILE_SIZE - scroll[0], y * TILE_SIZE - scroll[1]))
-            elif tile == "2":
-                display.blit(grass_image, (x * TILE_SIZE - scroll[0], y * TILE_SIZE - scroll[1]))
-            # create rects for collisions
-            if tile != "0":
-                tile_rects.append(pygame.Rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE))
+    # draw tiles
+    tile_rects = []  # collision tiles
+    for y in range(VISIBLE_TILES_Y):
+        for x in range(VISIBLE_TILES_X):
+            target_x = x + int(scroll[0] / (CHUNK_SIZE * TILE_SIZE))
+            target_y = y + int(scroll[1] / (CHUNK_SIZE * TILE_SIZE))
+            target_chunk = str(target_x) + ";" + str(target_y)
+            # the map is generated as needed
+            if target_chunk not in game_map:
+                game_map[target_chunk] = generate_chunk(target_x, target_y)
+            # only draw the tiles in current chunk
+            for tile_pos, tile_type in game_map[target_chunk]:
+                display.blit(
+                    tile_index[tile_type], (tile_pos[0] * TILE_SIZE - scroll[0], tile_pos[1] * TILE_SIZE - scroll[1])
+                )
+                if tile_type in [1, 2]:
+                    tile_rects.append(
+                        pygame.Rect(tile_pos[0] * TILE_SIZE, tile_pos[1] * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+                    )
 
     player_movement = [0.0, 0.0]
     if moving_right:
@@ -260,6 +288,8 @@ while True:
             if event.key == K_LEFT:
                 moving_left = False
 
+    # d = pygame.font.Font().render(f"{len(game_map)=}", False, "black")
+    # display.blit(d, (20, 20))
     screen.blit(pygame.transform.scale(display, WINDOW_SIZE))
     pygame.display.update()
     clock.tick(60)
