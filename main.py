@@ -11,7 +11,11 @@ WINDOW_SIZE = (400, 400)
 screen = pygame.display.set_mode(WINDOW_SIZE, 0, 32)
 clock = pygame.time.Clock()
 
+player_image = pygame.image.load("player.png")
+
 while True:
+    screen.blit(player_image, (50, 50))
+
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
