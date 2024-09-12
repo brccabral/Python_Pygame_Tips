@@ -77,7 +77,11 @@ def move(rect: pygame.Rect, movement: list[float], tiles: list[pygame.Rect]):
 moving_right = False
 moving_left = False
 
+# player_y_momentum increases 0.2 each frame, it takes 5 frames to move 1 tile
 player_y_momentum = 0
+# use air_timer to check if player is colliding at bottom (on the ground)
+# if less than 6 frames, the player is considered on ground and can jump
+air_timer = 0
 
 player_rect = pygame.Rect(
     50,
@@ -117,6 +121,9 @@ while True:
     player_rect, collisions = move(player_rect, player_movement, tile_rects)
     if collisions["bottom"]:
         player_y_momentum = 0
+        air_timer = 0
+    else:
+        air_timer += 1
     if collisions["top"]:
         player_y_momentum = 0
 
@@ -132,7 +139,8 @@ while True:
             if event.key == K_LEFT:
                 moving_left = True
             if event.key == K_UP:
-                player_y_momentum = -5
+                if air_timer < 6:  # 5 frames to player_y_momentum gets to 1 (0.2 * 5)
+                    player_y_momentum = -5
         if event.type == KEYUP:
             if event.key == K_RIGHT:
                 moving_right = False
