@@ -66,6 +66,9 @@ vertical_momentum = 0
 # if less than 6 frames, the player is considered on ground and can jump
 air_timer = 0
 
+# camera
+scroll = [0.0, 0.0]
+
 
 def load_map(path):
     with open(path + ".txt", "r") as f:
@@ -90,13 +93,25 @@ player_rect = pygame.Rect(
 while True:
     display.fill((146, 244, 255))
 
+    # camera follows player, 20 is the smoothing factor
+    scroll[0] += (
+        player_rect.x - scroll[0] - display.get_width() // 2 - player_rect.width // 2
+    ) / 20
+    scroll[1] += (
+        player_rect.y - scroll[1] - display.get_height() // 2 - player_rect.height // 2
+    ) / 20
+
     tile_rects = []
     for y, row in enumerate(game_map):
         for x, tile in enumerate(row):
             if tile == "1":
-                display.blit(dirt_image, (x * TILE_SIZE, y * TILE_SIZE))
+                display.blit(
+                    dirt_image, (x * TILE_SIZE - scroll[0], y * TILE_SIZE - scroll[1])
+                )
             elif tile == "2":
-                display.blit(grass_image, (x * TILE_SIZE, y * TILE_SIZE))
+                display.blit(
+                    grass_image, (x * TILE_SIZE - scroll[0], y * TILE_SIZE - scroll[1])
+                )
             # create rects for collisions
             if tile != "0":
                 tile_rects.append(
@@ -124,7 +139,7 @@ while True:
     if collisions["top"]:
         vertical_momentum = 0
 
-    display.blit(player_image, player_rect.topleft)
+    display.blit(player_image, (player_rect.x - scroll[0], player_rect.y - scroll[1]))
 
     for event in pygame.event.get():
         if event.type == QUIT:
