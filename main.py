@@ -85,12 +85,17 @@ def load_map(path):
 game_map = load_map("map")
 
 
-player_rect = pygame.Rect(
-    50,
-    50,
-    player_image.get_width(),
-    player_image.get_height(),
-)
+player_rect = pygame.Rect(50, 50, player_image.get_width(), player_image.get_height())
+
+# [depth, Rect]
+# depth makes object closer to move faster giving a parallax effect
+background_objects = [
+    [0.25, [120, 10, 70, 400]],
+    [0.25, [280, 30, 40, 400]],
+    [0.5, [30, 40, 40, 400]],
+    [0.5, [130, 90, 100, 400]],
+    [0.5, [300, 80, 120, 400]],
+]
 
 while True:
     display.fill((146, 244, 255))
@@ -101,6 +106,21 @@ while True:
     scroll = true_scroll.copy()
     scroll[0] = int(scroll[0])
     scroll[1] = int(scroll[1])
+
+    # horizon background
+    pygame.draw.rect(display, (7, 80, 75), pygame.Rect(0, 120, 300, 80))
+
+    for back_depth, back_rect in background_objects:
+        obj_rect = pygame.Rect(
+            back_rect[0] - scroll[0] * back_depth,
+            back_rect[1] - scroll[1] * back_depth,
+            back_rect[2],
+            back_rect[3],
+        )
+        if back_depth == 0.5:
+            pygame.draw.rect(display, (14, 222, 150), obj_rect)
+        else:
+            pygame.draw.rect(display, (9, 91, 85), obj_rect)
 
     tile_rects = []
     for y, row in enumerate(game_map):
