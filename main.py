@@ -20,23 +20,6 @@ player_image.set_colorkey((255, 255, 255))
 grass_image = pygame.image.load("grass.png").convert()
 dirt_image = pygame.image.load("dirt.png").convert()
 
-# fmt: off
-game_map = [['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
-            ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
-            ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
-            ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
-            ['0', '0', '0', '0', '0', '0', '0', '2', '2', '2', '2', '2', '0', '0', '0', '0', '0', '0', '0'],
-            ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
-            ['2', '2', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '2', '2'],
-            ['1', '1', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '1', '1'],
-            ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1'],
-            ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1'],
-            ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1'],
-            ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1'],
-            ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1']
-            ]
-# fmt: on
-
 
 def collision_test(rect: pygame.Rect, tiles: list[pygame.Rect]):
     hit_list: list[pygame.Rect] = []
@@ -77,11 +60,25 @@ def move(rect: pygame.Rect, movement: list[float], tiles: list[pygame.Rect]):
 moving_right = False
 moving_left = False
 
-# player_y_momentum increases 0.2 each frame, it takes 5 frames to move 1 tile
-player_y_momentum = 0
+# vertical_momentum increases 0.2 each frame, it takes 5 frames to move 1 tile
+vertical_momentum = 0
 # use air_timer to check if player is colliding at bottom (on the ground)
 # if less than 6 frames, the player is considered on ground and can jump
 air_timer = 0
+
+
+def load_map(path):
+    with open(path + ".txt", "r") as f:
+        data = f.read()
+    data = data.split("\n")
+    game_map = []
+    for row in data:
+        game_map.append(list(row))
+    return game_map
+
+
+game_map = load_map("map")
+
 
 player_rect = pygame.Rect(
     50,
@@ -111,21 +108,21 @@ while True:
         player_movement[0] += 2
     if moving_left:
         player_movement[0] -= 2
-    player_movement[1] += player_y_momentum
+    player_movement[1] += vertical_momentum
 
     # gravity
-    player_y_momentum += 0.2
-    if player_y_momentum > 3:
-        player_y_momentum = 3
+    vertical_momentum += 0.2
+    if vertical_momentum > 3:
+        vertical_momentum = 3
 
     player_rect, collisions = move(player_rect, player_movement, tile_rects)
     if collisions["bottom"]:
-        player_y_momentum = 0
+        vertical_momentum = 0
         air_timer = 0
     else:
         air_timer += 1
     if collisions["top"]:
-        player_y_momentum = 0
+        vertical_momentum = 0
 
     display.blit(player_image, player_rect.topleft)
 
@@ -139,8 +136,8 @@ while True:
             if event.key == K_LEFT:
                 moving_left = True
             if event.key == K_UP:
-                if air_timer < 6:  # 5 frames to player_y_momentum gets to 1 (0.2 * 5)
-                    player_y_momentum = -5
+                if air_timer < 6:  # 5 frames to vertical_momentum gets to 1 (0.2 * 5)
+                    vertical_momentum = -5
         if event.type == KEYUP:
             if event.key == K_RIGHT:
                 moving_right = False
