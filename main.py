@@ -1,3 +1,4 @@
+import os
 import sys
 import pygame
 from pygame.locals import QUIT, KEYDOWN, KEYUP, K_RIGHT, K_LEFT, K_UP
@@ -13,9 +14,6 @@ screen = pygame.display.set_mode(WINDOW_SIZE, 0, 32)
 display = pygame.Surface((300, 200))
 
 clock = pygame.time.Clock()
-
-player_image = pygame.image.load("player.png").convert()
-player_image.set_colorkey((255, 255, 255))
 
 grass_image = pygame.image.load("grass.png").convert()
 dirt_image = pygame.image.load("dirt.png").convert()
@@ -82,10 +80,53 @@ def load_map(path):
     return game_map
 
 
+global animation_frames
+animation_frames: dict[str, pygame.Surface] = {}
+
+
+def load_animation(path: str, frame_durations: list[int]):
+    """
+    creates a list with the names of the frames\n
+    if `frame_durations` = [3,4]\n
+    `['idle_0', 'idle_0', 'idle_0', 'idle_1', 'idle_1', 'idle_1', 'idle_1']`\n
+    and fills the global `animation_frames` with the actual Surface\n
+    `{'idle_0': Surface0, 'idle_1': Surface1}`\n
+    """
+    global animation_frames
+
+    _, animation_name = os.path.split(path)
+    animation_frame_data: list[str] = []
+    for n, frame in enumerate(frame_durations):
+        animation_frame_id = animation_name + "_" + str(n)
+        img_loc = os.path.join(path, animation_frame_id + ".png")
+        animation_image = pygame.image.load(img_loc).convert()
+        animation_image.set_colorkey((255, 255, 255))
+        animation_frames[animation_frame_id] = animation_image.copy()
+        for i in range(frame):
+            animation_frame_data.append(animation_frame_id)
+    return animation_frame_data
+
+
+def change_action(action_var: str, frame: int, new_value: str):
+    if action_var != new_value:
+        action_var = new_value
+        frame = 0
+    return action_var, frame
+
+
+animation_database: dict[str, list[str]] = {}
+
+animation_database["run"] = load_animation("player_animations/run", [7, 7])
+animation_database["idle"] = load_animation("player_animations/idle", [7, 7, 40])
+
+player_action = "idle"
+player_frame = 0
+player_flip = False
+
 game_map = load_map("map")
 
 
-player_rect = pygame.Rect(50, 50, player_image.get_width(), player_image.get_height())
+player_rect = pygame.Rect(50, 50, 5, 13)
 
 # [depth, Rect]
 # depth makes object closer to move faster giving a parallax effect
@@ -154,7 +195,23 @@ while True:
     if collisions["top"]:
         vertical_momentum = 0
 
-    display.blit(player_image, (player_rect.x - scroll[0], player_rect.y - scroll[1]))
+    # animation
+    if player_movement[0] > 0:
+        player_action, player_frame = change_action(player_action, player_frame, "run")
+        player_flip = False
+    elif player_movement[0] == 0:
+        player_action, player_frame = change_action(player_action, player_frame, "idle")
+    elif player_movement[0] < 0:
+        player_action, player_frame = change_action(player_action, player_frame, "run")
+        player_flip = True
+    player_frame += 1
+    if player_frame >= len(animation_database[player_action]):
+        player_frame = 0
+    player_img_id = animation_database[player_action][player_frame]
+    player_image = animation_frames[player_img_id]
+    display.blit(
+        pygame.transform.flip(player_image, player_flip, False), (player_rect.x - scroll[0], player_rect.y - scroll[1])
+    )
 
     for event in pygame.event.get():
         if event.type == QUIT:
