@@ -1,7 +1,7 @@
 import os
 import sys
 import pygame
-from pygame.locals import QUIT, KEYDOWN, KEYUP, K_RIGHT, K_LEFT, K_UP, K_w
+from pygame.locals import QUIT, KEYDOWN, KEYUP, K_RIGHT, K_LEFT, K_UP, K_w, K_e
 
 pygame.init()
 
@@ -226,6 +226,8 @@ while True:
         if event.type == KEYDOWN:
             if event.key == K_w:
                 pygame.mixer.music.fadeout(1000)
+            if event.key == K_e:
+                pygame.mixer.music.play(-1)
             if event.key == K_RIGHT:
                 moving_right = True
             if event.key == K_LEFT:
