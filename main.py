@@ -8,6 +8,9 @@ from pygame.locals import QUIT, KEYDOWN, KEYUP, K_RIGHT, K_LEFT, K_UP, K_w, K_e
 pygame.mixer.pre_init(44100, -16, 2, 512)
 pygame.init()
 
+# allow more sounds to play at once, if not, sounds will be cutoff or not play
+pygame.mixer.set_num_channels(64)
+
 pygame.display.set_caption("My Pygame Window")
 
 WINDOW_SIZE = (600, 400)
