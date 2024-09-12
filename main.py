@@ -31,6 +31,9 @@ dirt_image = pygame.image.load("data/images/dirt.png").convert()
 plant_image = pygame.image.load("data/images/plant.png").convert()
 plant_image.set_colorkey((255, 255, 255))
 
+jumper_image = pygame.image.load("data/images/jumper.png").convert()
+jumper_image.set_colorkey((255, 255, 255))
+
 tile_index = {1: grass_image, 2: dirt_image, 3: plant_image}
 
 moving_right = False
@@ -76,6 +79,22 @@ grass_sounds[1].set_volume(0.2)
 pygame.mixer.music.load("data/audio/music.wav")
 pygame.mixer.music.play(-1)
 
+
+class jumper_obj:
+    def __init__(self, loc: tuple[int, int]):
+        self.loc = loc
+
+    def render(self, surf: pygame.Surface, scroll: list[float]):
+        surf.blit(jumper_image, (self.loc[0] - scroll[0], self.loc[1] - scroll[1]))
+
+    def get_rect(self):
+        return pygame.Rect(self.loc[0], self.loc[1], jumper_image.get_width(), jumper_image.get_height())
+
+    def collision_test(self, rect: pygame.Rect):
+        jumper_rect = self.get_rect()
+        return jumper_rect.colliderect(rect)
+
+
 e.load_animations("data/images/entities/")
 
 # the map is generated as needed
@@ -94,6 +113,11 @@ background_objects = [
     [0.5, [130, 90, 100, 400]],
     [0.5, [300, 80, 120, 400]],
 ]
+
+jumper_objects: list[jumper_obj] = []
+for i in range(5):
+    jumper_objects.append(jumper_obj((random.randint(0, 600) - 300, 80)))
+
 
 while True:
     display.fill((146, 244, 255))
@@ -182,6 +206,9 @@ while True:
 
     player.change_frame(1)
     player.display(display, scroll)
+
+    for jumper in jumper_objects:
+        jumper.render(display, scroll)
 
     for event in pygame.event.get():
         if event.type == QUIT:
