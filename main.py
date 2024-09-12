@@ -1,4 +1,5 @@
 import os
+import random
 import sys
 import pygame
 from pygame.locals import QUIT, KEYDOWN, KEYUP, K_RIGHT, K_LEFT, K_UP, K_w, K_e
@@ -123,6 +124,8 @@ animation_database["idle"] = load_animation("player_animations/idle", [7, 7, 40]
 
 jump_sound = pygame.mixer.Sound("sounds/jump.wav")
 grass_sounds = [pygame.mixer.Sound("sounds/grass_0.wav"), pygame.mixer.Sound("sounds/grass_1.wav")]
+grass_sounds[0].set_volume(0.2)
+grass_sounds[1].set_volume(0.2)
 
 pygame.mixer.music.load("sounds/music.wav")
 pygame.mixer.music.play(-1)
@@ -133,6 +136,7 @@ player_flip = False
 
 game_map = load_map("map")
 
+grass_sound_timer = 0
 
 player_rect = pygame.Rect(50, 50, 5, 13)
 
@@ -148,6 +152,10 @@ background_objects = [
 
 while True:
     display.fill((146, 244, 255))
+
+    # only play grass sound if timer is 0 and player is moving on the ground
+    if grass_sound_timer > 0:
+        grass_sound_timer -= 1
 
     # camera follows player, 20 is the smoothing factor
     true_scroll[0] += (player_rect.x - true_scroll[0] - display.get_width() // 2 - player_rect.width // 2) / 20
@@ -198,6 +206,11 @@ while True:
     if collisions["bottom"]:
         vertical_momentum = 0
         air_timer = 0
+        # only play grass sound if timer is 0 and player is moving on the ground
+        if player_movement[0] != 0:
+            if grass_sound_timer == 0:
+                grass_sound_timer = 30
+                random.choice(grass_sounds).play()
     else:
         air_timer += 1
     if collisions["top"]:
