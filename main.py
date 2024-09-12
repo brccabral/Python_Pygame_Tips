@@ -1,5 +1,5 @@
 from math import ceil
-import os
+import data.engine as e
 import random
 import sys
 import pygame
@@ -33,43 +33,6 @@ plant_image.set_colorkey((255, 255, 255))
 
 tile_index = {1: grass_image, 2: dirt_image, 3: plant_image}
 
-
-def collision_test(rect: pygame.Rect, tiles: list[pygame.Rect]):
-    hit_list: list[pygame.Rect] = []
-    for tile in tiles:
-        if rect.colliderect(tile):
-            hit_list.append(tile)
-    return hit_list
-
-
-def move(rect: pygame.Rect, movement: list[float], tiles: list[pygame.Rect]):
-    collision_types = {"top": False, "bottom": False, "right": False, "left": False}
-
-    # horizontal collision
-    rect.x += movement[0]
-    hit_list = collision_test(rect, tiles)
-    for tile in hit_list:
-        if movement[0] > 0:
-            rect.right = tile.left
-            collision_types["right"] = True
-        elif movement[0] < 0:
-            rect.left = tile.right
-            collision_types["left"] = True
-
-    # vertical collision
-    rect.y += movement[1]
-    hit_list = collision_test(rect, tiles)
-    for tile in hit_list:
-        if movement[1] > 0:
-            rect.bottom = tile.top
-            collision_types["bottom"] = True
-        elif movement[1] < 0:
-            rect.top = tile.bottom
-            collision_types["top"] = True
-
-    return rect, collision_types
-
-
 moving_right = False
 moving_left = False
 
@@ -83,9 +46,6 @@ air_timer = 0
 # true_scroll uses floats to follow player, but is converted to scroll with `int`
 # when drawing on screen to avoing overlapping pixels
 true_scroll = [0.0, 0.0]
-
-global animation_frames
-animation_frames: dict[str, pygame.Surface] = {}
 
 
 # generate the visible tiles on the fly
@@ -108,41 +68,6 @@ def generate_chunk(x: int, y: int):
     return chunk_data
 
 
-def load_animation(path: str, frame_durations: list[int]):
-    """
-    creates a list with the names of the frames\n
-    if `frame_durations` = [3,4]\n
-    `['idle_0', 'idle_0', 'idle_0', 'idle_1', 'idle_1', 'idle_1', 'idle_1']`\n
-    and fills the global `animation_frames` with the actual Surface\n
-    `{'idle_0': Surface0, 'idle_1': Surface1}`\n
-    """
-    global animation_frames
-
-    _, animation_name = os.path.split(path)
-    animation_frame_data: list[str] = []
-    for n, frame in enumerate(frame_durations):
-        animation_frame_id = animation_name + "_" + str(n)
-        img_loc = os.path.join(path, animation_frame_id + ".png")
-        animation_image = pygame.image.load(img_loc).convert()
-        animation_image.set_colorkey((255, 255, 255))
-        animation_frames[animation_frame_id] = animation_image.copy()
-        for i in range(frame):
-            animation_frame_data.append(animation_frame_id)
-    return animation_frame_data
-
-
-def change_action(action_var: str, frame: int, new_value: str):
-    if action_var != new_value:
-        action_var = new_value
-        frame = 0
-    return action_var, frame
-
-
-animation_database: dict[str, list[str]] = {}
-
-animation_database["run"] = load_animation("data/images/entities/player/run", [7, 7])
-animation_database["idle"] = load_animation("data/images/entities/player/idle", [7, 7, 40])
-
 jump_sound = pygame.mixer.Sound("data/audio/jump.wav")
 grass_sounds = [pygame.mixer.Sound("data/audio/grass_0.wav"), pygame.mixer.Sound("data/audio/grass_1.wav")]
 grass_sounds[0].set_volume(0.2)
@@ -151,16 +76,14 @@ grass_sounds[1].set_volume(0.2)
 pygame.mixer.music.load("data/audio/music.wav")
 pygame.mixer.music.play(-1)
 
-player_action = "idle"
-player_frame = 0
-player_flip = False
+e.load_animations("data/images/entities/")
 
 # the map is generated as needed
 game_map: dict[str, list[tuple[list[int], int]]] = {}
 
 grass_sound_timer = 0
 
-player_rect = pygame.Rect(50, 50, 5, 13)
+player = e.entity(100, 100, 5, 13, "player")
 
 # [depth, Rect]
 # depth makes object closer to move faster giving a parallax effect
@@ -180,8 +103,8 @@ while True:
         grass_sound_timer -= 1
 
     # camera follows player, 20 is the smoothing factor
-    true_scroll[0] += (player_rect.x - true_scroll[0] - display.get_width() // 2 - player_rect.width // 2) / 20
-    true_scroll[1] += (player_rect.y - true_scroll[1] - display.get_height() // 2 - player_rect.height // 2) / 20
+    true_scroll[0] += (player.x - true_scroll[0] - display.get_width() // 2 - player.size_x // 2) / 20
+    true_scroll[1] += (player.y - true_scroll[1] - display.get_height() // 2 - player.size_y // 2) / 20
     scroll = true_scroll.copy()
     scroll[0] = int(scroll[0])
     scroll[1] = int(scroll[1])
@@ -233,8 +156,8 @@ while True:
     if vertical_momentum > 3:
         vertical_momentum = 3
 
-    player_rect, collisions = move(player_rect, player_movement, tile_rects)
-    if collisions["bottom"]:
+    collision_types = player.move(player_movement, tile_rects)
+    if collision_types.bottom:
         vertical_momentum = 0
         air_timer = 0
         # only play grass sound if timer is 0 and player is moving on the ground
@@ -244,26 +167,21 @@ while True:
                 random.choice(grass_sounds).play()
     else:
         air_timer += 1
-    if collisions["top"]:
+    if collision_types.top:
         vertical_momentum = 0
 
     # animation
     if player_movement[0] > 0:
-        player_action, player_frame = change_action(player_action, player_frame, "run")
-        player_flip = False
+        player.set_action("run")
+        player.set_flip(False)
     elif player_movement[0] == 0:
-        player_action, player_frame = change_action(player_action, player_frame, "idle")
+        player.set_action("idle")
     elif player_movement[0] < 0:
-        player_action, player_frame = change_action(player_action, player_frame, "run")
-        player_flip = True
-    player_frame += 1
-    if player_frame >= len(animation_database[player_action]):
-        player_frame = 0
-    player_img_id = animation_database[player_action][player_frame]
-    player_image = animation_frames[player_img_id]
-    display.blit(
-        pygame.transform.flip(player_image, player_flip, False), (player_rect.x - scroll[0], player_rect.y - scroll[1])
-    )
+        player.set_action("run")
+        player.set_flip(True)
+
+    player.change_frame(1)
+    player.display(display, scroll)
 
     for event in pygame.event.get():
         if event.type == QUIT:
