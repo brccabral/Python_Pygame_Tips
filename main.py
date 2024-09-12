@@ -1,6 +1,6 @@
 import sys
 import pygame
-from pygame.locals import QUIT
+from pygame.locals import QUIT, KEYDOWN, KEYUP, K_RIGHT, K_LEFT
 
 pygame.init()
 
@@ -13,13 +13,34 @@ clock = pygame.time.Clock()
 
 player_image = pygame.image.load("player.png")
 
+moving_right = False
+moving_left = False
+
+player_location = [50, 50]
+
 while True:
-    screen.blit(player_image, (50, 50))
+    screen.fill((146, 244, 255))
+    screen.blit(player_image, player_location)
+
+    if moving_right:
+        player_location[0] += 4
+    if moving_left:
+        player_location[0] -= 4
 
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
+        if event.type == KEYDOWN:
+            if event.key == K_RIGHT:
+                moving_right = True
+            if event.key == K_LEFT:
+                moving_left = True
+        if event.type == KEYUP:
+            if event.key == K_RIGHT:
+                moving_right = False
+            if event.key == K_LEFT:
+                moving_left = False
 
     pygame.display.update()
     clock.tick(60)
