@@ -37,15 +37,51 @@ game_map = [['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0
             ]
 # fmt: on
 
+
+def collision_test(rect: pygame.Rect, tiles: list[pygame.Rect]):
+    hit_list: list[pygame.Rect] = []
+    for tile in tiles:
+        if rect.colliderect(tile):
+            hit_list.append(tile)
+    return hit_list
+
+
+def move(rect: pygame.Rect, movement: list[float], tiles: list[pygame.Rect]):
+    collision_types = {"top": False, "bottom": False, "right": False, "left": False}
+
+    # horizontal collision
+    rect.x += movement[0]
+    hit_list = collision_test(rect, tiles)
+    for tile in hit_list:
+        if movement[0] > 0:
+            rect.right = tile.left
+            collision_types["right"] = True
+        elif movement[0] < 0:
+            rect.left = tile.right
+            collision_types["left"] = True
+
+    # vertical collision
+    rect.y += movement[1]
+    hit_list = collision_test(rect, tiles)
+    for tile in hit_list:
+        if movement[1] > 0:
+            rect.bottom = tile.top
+            collision_types["bottom"] = True
+        elif movement[1] < 0:
+            rect.top = tile.bottom
+            collision_types["top"] = True
+
+    return rect, collision_types
+
+
 moving_right = False
 moving_left = False
 
-player_location = [50.0, 50.0]
 player_y_momentum = 0
 
 player_rect = pygame.Rect(
-    player_location[0],
-    player_location[1],
+    50,
+    50,
     player_image.get_width(),
     player_image.get_height(),
 )
@@ -66,18 +102,21 @@ while True:
                     pygame.Rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
                 )
 
-    display.blit(player_image, player_location)
-
-    player_y_momentum += 0.2  # gravity
-    player_location[1] += player_y_momentum
-
+    player_movement = [0.0, 0.0]
     if moving_right:
-        player_location[0] += 4
+        player_movement[0] += 2
     if moving_left:
-        player_location[0] -= 4
+        player_movement[0] -= 2
+    player_movement[1] += player_y_momentum
 
-    player_rect.x = player_location[0]
-    player_rect.y = player_location[1]
+    # gravity
+    player_y_momentum += 0.2
+    if player_y_momentum > 3:
+        player_y_momentum = 3
+
+    player_rect, collisions = move(player_rect, player_movement, tile_rects)
+
+    display.blit(player_image, player_rect.topleft)
 
     for event in pygame.event.get():
         if event.type == QUIT:
