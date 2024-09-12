@@ -26,9 +26,9 @@ VISIBLE_TILES_X = ceil(display.get_width() / (CHUNK_SIZE * TILE_SIZE)) + 1
 
 clock = pygame.time.Clock()
 
-grass_image = pygame.image.load("grass.png").convert()
-dirt_image = pygame.image.load("dirt.png").convert()
-plant_image = pygame.image.load("plant.png").convert()
+grass_image = pygame.image.load("data/images/grass.png").convert()
+dirt_image = pygame.image.load("data/images/dirt.png").convert()
+plant_image = pygame.image.load("data/images/plant.png").convert()
 plant_image.set_colorkey((255, 255, 255))
 
 tile_index = {1: grass_image, 2: dirt_image, 3: plant_image}
@@ -140,15 +140,15 @@ def change_action(action_var: str, frame: int, new_value: str):
 
 animation_database: dict[str, list[str]] = {}
 
-animation_database["run"] = load_animation("player_animations/run", [7, 7])
-animation_database["idle"] = load_animation("player_animations/idle", [7, 7, 40])
+animation_database["run"] = load_animation("data/images/entities/player/run", [7, 7])
+animation_database["idle"] = load_animation("data/images/entities/player/idle", [7, 7, 40])
 
-jump_sound = pygame.mixer.Sound("sounds/jump.wav")
-grass_sounds = [pygame.mixer.Sound("sounds/grass_0.wav"), pygame.mixer.Sound("sounds/grass_1.wav")]
+jump_sound = pygame.mixer.Sound("data/audio/jump.wav")
+grass_sounds = [pygame.mixer.Sound("data/audio/grass_0.wav"), pygame.mixer.Sound("data/audio/grass_1.wav")]
 grass_sounds[0].set_volume(0.2)
 grass_sounds[1].set_volume(0.2)
 
-pygame.mixer.music.load("sounds/music.wav")
+pygame.mixer.music.load("data/audio/music.wav")
 pygame.mixer.music.play(-1)
 
 player_action = "idle"
