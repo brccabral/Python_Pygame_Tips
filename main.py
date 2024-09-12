@@ -7,6 +7,7 @@ pygame.init()
 pygame.display.set_caption("My Pygame Window")
 
 WINDOW_SIZE = (600, 400)
+TILE_SIZE = 16
 
 screen = pygame.display.set_mode(WINDOW_SIZE, 0, 32)
 display = pygame.Surface((300, 200))
@@ -14,6 +15,25 @@ display = pygame.Surface((300, 200))
 clock = pygame.time.Clock()
 
 player_image = pygame.image.load("player.png")
+grass_image = pygame.image.load("grass.png")
+dirt_image = pygame.image.load("dirt.png")
+
+# fmt: off
+game_map = [['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
+            ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
+            ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
+            ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
+            ['0', '0', '0', '0', '0', '0', '0', '2', '2', '2', '2', '2', '0', '0', '0', '0', '0', '0', '0'],
+            ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
+            ['2', '2', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '2', '2'],
+            ['1', '1', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '1', '1'],
+            ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1'],
+            ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1'],
+            ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1'],
+            ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1'],
+            ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1']
+            ]
+# fmt: on
 
 moving_right = False
 moving_left = False
@@ -30,6 +50,20 @@ player_rect = pygame.Rect(
 
 while True:
     display.fill((146, 244, 255))
+
+    tile_rects = []
+    for y, row in enumerate(game_map):
+        for x, tile in enumerate(row):
+            if tile == "1":
+                display.blit(dirt_image, (x * TILE_SIZE, y * TILE_SIZE))
+            elif tile == "2":
+                display.blit(grass_image, (x * TILE_SIZE, y * TILE_SIZE))
+            # create rects for collisions
+            if tile != "0":
+                tile_rects.append(
+                    pygame.Rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+                )
+
     display.blit(player_image, player_location)
 
     player_y_momentum += 0.2  # gravity
