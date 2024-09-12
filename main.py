@@ -81,7 +81,7 @@ pygame.mixer.music.play(-1)
 
 
 class jumper_obj:
-    def __init__(self, loc: tuple[int, int]):
+    def __init__(self, loc: tuple[float, float]):
         self.loc = loc
 
     def render(self, surf: pygame.Surface, scroll: list[float]):
@@ -211,6 +211,7 @@ while True:
         jumper.render(display, scroll)
         if jumper.collision_test(player.obj.rect):
             vertical_momentum = -8
+        jumper.loc = (jumper.loc[0] - 0.2, jumper.loc[1])
 
     for event in pygame.event.get():
         if event.type == QUIT:
