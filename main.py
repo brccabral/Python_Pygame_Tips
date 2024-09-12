@@ -1,7 +1,7 @@
 import os
 import sys
 import pygame
-from pygame.locals import QUIT, KEYDOWN, KEYUP, K_RIGHT, K_LEFT, K_UP
+from pygame.locals import QUIT, KEYDOWN, KEYUP, K_RIGHT, K_LEFT, K_UP, K_w
 
 pygame.init()
 
@@ -119,6 +119,12 @@ animation_database: dict[str, list[str]] = {}
 animation_database["run"] = load_animation("player_animations/run", [7, 7])
 animation_database["idle"] = load_animation("player_animations/idle", [7, 7, 40])
 
+jump_sound = pygame.mixer.Sound("sounds/jump.wav")
+grass_sounds = [pygame.mixer.Sound("sounds/grass_0.wav"), pygame.mixer.Sound("sounds/grass_1.wav")]
+
+pygame.mixer.music.load("sounds/music.wav")
+pygame.mixer.music.play(-1)
+
 player_action = "idle"
 player_frame = 0
 player_flip = False
@@ -218,6 +224,8 @@ while True:
             pygame.quit()
             sys.exit()
         if event.type == KEYDOWN:
+            if event.key == K_w:
+                pygame.mixer.music.fadeout(1000)
             if event.key == K_RIGHT:
                 moving_right = True
             if event.key == K_LEFT:
