@@ -6,9 +6,11 @@ pygame.init()
 
 pygame.display.set_caption("My Pygame Window")
 
-WINDOW_SIZE = (400, 400)
+WINDOW_SIZE = (600, 400)
 
 screen = pygame.display.set_mode(WINDOW_SIZE, 0, 32)
+display = pygame.Surface((300, 200))
+
 clock = pygame.time.Clock()
 
 player_image = pygame.image.load("player.png")
@@ -27,8 +29,8 @@ player_rect = pygame.Rect(
 )
 
 while True:
-    screen.fill((146, 244, 255))
-    screen.blit(player_image, player_location)
+    display.fill((146, 244, 255))
+    display.blit(player_image, player_location)
 
     player_y_momentum += 0.2  # gravity
     player_location[1] += player_y_momentum
@@ -56,5 +58,6 @@ while True:
             if event.key == K_LEFT:
                 moving_left = False
 
+    screen.blit(pygame.transform.scale(display, WINDOW_SIZE))
     pygame.display.update()
     clock.tick(60)
