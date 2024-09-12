@@ -14,9 +14,11 @@ display = pygame.Surface((300, 200))
 
 clock = pygame.time.Clock()
 
-player_image = pygame.image.load("player.png")
-grass_image = pygame.image.load("grass.png")
-dirt_image = pygame.image.load("dirt.png")
+player_image = pygame.image.load("player.png").convert()
+player_image.set_colorkey((255, 255, 255))
+
+grass_image = pygame.image.load("grass.png").convert()
+dirt_image = pygame.image.load("dirt.png").convert()
 
 # fmt: off
 game_map = [['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
