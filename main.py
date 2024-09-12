@@ -67,7 +67,9 @@ vertical_momentum = 0
 air_timer = 0
 
 # camera
-scroll = [0.0, 0.0]
+# true_scroll uses floats to follow player, but is converted to scroll with `int`
+# when drawing on screen to avoing overlapping pixels
+true_scroll = [0.0, 0.0]
 
 
 def load_map(path):
@@ -94,29 +96,22 @@ while True:
     display.fill((146, 244, 255))
 
     # camera follows player, 20 is the smoothing factor
-    scroll[0] += (
-        player_rect.x - scroll[0] - display.get_width() // 2 - player_rect.width // 2
-    ) / 20
-    scroll[1] += (
-        player_rect.y - scroll[1] - display.get_height() // 2 - player_rect.height // 2
-    ) / 20
+    true_scroll[0] += (player_rect.x - true_scroll[0] - display.get_width() // 2 - player_rect.width // 2) / 20
+    true_scroll[1] += (player_rect.y - true_scroll[1] - display.get_height() // 2 - player_rect.height // 2) / 20
+    scroll = true_scroll.copy()
+    scroll[0] = int(scroll[0])
+    scroll[1] = int(scroll[1])
 
     tile_rects = []
     for y, row in enumerate(game_map):
         for x, tile in enumerate(row):
             if tile == "1":
-                display.blit(
-                    dirt_image, (x * TILE_SIZE - scroll[0], y * TILE_SIZE - scroll[1])
-                )
+                display.blit(dirt_image, (x * TILE_SIZE - scroll[0], y * TILE_SIZE - scroll[1]))
             elif tile == "2":
-                display.blit(
-                    grass_image, (x * TILE_SIZE - scroll[0], y * TILE_SIZE - scroll[1])
-                )
+                display.blit(grass_image, (x * TILE_SIZE - scroll[0], y * TILE_SIZE - scroll[1]))
             # create rects for collisions
             if tile != "0":
-                tile_rects.append(
-                    pygame.Rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
-                )
+                tile_rects.append(pygame.Rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE))
 
     player_movement = [0.0, 0.0]
     if moving_right:
