@@ -1,6 +1,6 @@
 import sys
 import pygame
-from pygame.locals import QUIT, KEYDOWN, KEYUP, K_RIGHT, K_LEFT
+from pygame.locals import QUIT, KEYDOWN, KEYUP, K_RIGHT, K_LEFT, K_UP
 
 pygame.init()
 
@@ -115,6 +115,10 @@ while True:
         player_y_momentum = 3
 
     player_rect, collisions = move(player_rect, player_movement, tile_rects)
+    if collisions["bottom"]:
+        player_y_momentum = 0
+    if collisions["top"]:
+        player_y_momentum = 0
 
     display.blit(player_image, player_rect.topleft)
 
@@ -127,6 +131,8 @@ while True:
                 moving_right = True
             if event.key == K_LEFT:
                 moving_left = True
+            if event.key == K_UP:
+                player_y_momentum = -5
         if event.type == KEYUP:
             if event.key == K_RIGHT:
                 moving_right = False
