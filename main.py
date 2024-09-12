@@ -21,8 +21,8 @@ CHUNK_SIZE = 8  # visible tiles is a 8x8 grid
 screen = pygame.display.set_mode(WINDOW_SIZE, 0, 32)
 display = pygame.Surface((300, 200))
 
-VISIBLE_TILES_Y = ceil(display.get_height() / (CHUNK_SIZE * TILE_SIZE))
-VISIBLE_TILES_X = ceil(display.get_width() / (CHUNK_SIZE * TILE_SIZE))
+VISIBLE_TILES_Y = ceil(display.get_height() / (CHUNK_SIZE * TILE_SIZE)) + 1
+VISIBLE_TILES_X = ceil(display.get_width() / (CHUNK_SIZE * TILE_SIZE)) + 1
 
 clock = pygame.time.Clock()
 
@@ -205,8 +205,8 @@ while True:
     tile_rects = []  # collision tiles
     for y in range(VISIBLE_TILES_Y):
         for x in range(VISIBLE_TILES_X):
-            target_x = x + int(scroll[0] / (CHUNK_SIZE * TILE_SIZE))
-            target_y = y + int(scroll[1] / (CHUNK_SIZE * TILE_SIZE))
+            target_x = x - 1 + round(scroll[0] / (CHUNK_SIZE * TILE_SIZE))
+            target_y = y - 1 + round(scroll[1] / (CHUNK_SIZE * TILE_SIZE))
             target_chunk = str(target_x) + ";" + str(target_y)
             # the map is generated as needed
             if target_chunk not in game_map:
