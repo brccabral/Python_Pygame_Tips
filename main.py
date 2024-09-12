@@ -209,6 +209,8 @@ while True:
 
     for jumper in jumper_objects:
         jumper.render(display, scroll)
+        if jumper.collision_test(player.obj.rect):
+            vertical_momentum = -8
 
     for event in pygame.event.get():
         if event.type == QUIT:
