@@ -3,6 +3,8 @@ import sys
 import pygame
 from pygame.locals import QUIT, KEYDOWN, KEYUP, K_RIGHT, K_LEFT, K_UP, K_w, K_e
 
+# pre_init the mixer to avoid delay when we play sound effects (jump.play())
+pygame.mixer.pre_init(44100, -16, 2, 512)
 pygame.init()
 
 pygame.display.set_caption("My Pygame Window")
@@ -234,6 +236,7 @@ while True:
                 moving_left = True
             if event.key == K_UP:
                 if air_timer < 6:  # 5 frames to vertical_momentum gets to 1 (0.2 * 5)
+                    jump_sound.play()
                     vertical_momentum = -5
         if event.type == KEYUP:
             if event.key == K_RIGHT:
