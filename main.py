@@ -104,6 +104,10 @@ grass_sound_timer = 0
 
 player = e.entity(100, 100, 5, 13, "player")
 
+enemies: list[tuple[float, e.entity]] = []
+for i in range(5):
+    enemies.append((0, e.entity(random.randint(0, 600) - 300, 80, 13, 13, "enemy")))
+
 # [depth, Rect]
 # depth makes object closer to move faster giving a parallax effect
 background_objects = [
@@ -212,6 +216,26 @@ while True:
         if jumper.collision_test(player.obj.rect):
             vertical_momentum = -8
         jumper.loc = (jumper.loc[0] - 0.2, jumper.loc[1])
+
+    for enemy_y_speed, enemy in enemies:
+        enemy_y_speed += 0.2
+        if enemy_y_speed > 3:
+            enemy_y_speed = 3
+        enemy_movement = [0, enemy_y_speed]
+        if player.x > enemy.x + 5:
+            enemy_movement[0] = 1
+        if player.x < enemy.x - 5:
+            enemy_movement[0] = -1
+        # if we move far away from enemy, tile_rects won't be in the same chunk and the enemies
+        # will fall and won't be visible anymore
+        collision_types = enemy.move(enemy_movement, tile_rects)
+        if collision_types.bottom:
+            enemy_y_speed = 0
+
+        enemy.display(display, scroll)
+
+        if player.obj.rect.colliderect(enemy.obj.rect):
+            vertical_momentum = -4
 
     for event in pygame.event.get():
         if event.type == QUIT:
