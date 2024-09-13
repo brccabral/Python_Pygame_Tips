@@ -21,7 +21,8 @@ particles: list[Particle] = []
 while True:
     screen.fill((0, 0, 0))
 
-    particles.append(Particle([250, 250], [random.randint(0, 20) / 10 - 1, -2], random.randint(4, 6)))
+    mouse_pos = pygame.mouse.get_pos()
+    particles.append(Particle([mouse_pos[0], mouse_pos[1]], [random.randint(0, 20) / 10 - 1, -2], random.randint(4, 6)))
 
     for particle in particles:
         particle.location[0] += particle.velocity[0]
