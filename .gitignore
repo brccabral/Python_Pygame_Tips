@@ -3,3 +3,7 @@
 sounds/
 data/*
 !data/engine.py
+
+build/
+dist/
+*.spec
