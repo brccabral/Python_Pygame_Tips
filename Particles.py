@@ -48,17 +48,19 @@ while True:
             )
         )
 
-    for particle in particles:
+    to_remove = []
+    for i, particle in enumerate(particles):
         particle.location[0] += particle.velocity[0]
         particle.location[1] += particle.velocity[1]
         particle.timer -= 0.05  # also radius
         particle.velocity[1] += 0.1  # gravity
         pygame.draw.circle(screen, (255, 255, 255), particle.location, particle.timer)
+        if particle.timer <= 0:
+            to_remove.append(i)
 
     # remove from a list outside main loop to avoid screen flickering
-    for i, p in sorted(enumerate(particles), key=lambda k: k[1].timer, reverse=True):
-        if p.timer <= 0:
-            particles.pop(i)
+    for i in sorted(to_remove, reverse=True):
+        particles.pop(i)
 
     for k, tile in tile_map.items():
         pygame.draw.rect(screen, tile[2], pygame.Rect(tile[0] * TILE_SIZE, tile[1] * TILE_SIZE, TILE_SIZE, TILE_SIZE))
