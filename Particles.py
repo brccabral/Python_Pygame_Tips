@@ -16,7 +16,6 @@ class Particle:
         self.timer = timer
 
 
-# [loc, velocity, timer] - timer is also radius
 particles: list[Particle] = []
 
 while True:
@@ -25,11 +24,11 @@ while True:
     particles.append(Particle([250, 250], [random.randint(0, 20) / 10 - 1, -2], random.randint(4, 6)))
 
     for particle in particles:
-        # [loc, velocity, timer] - timer is also radius
         particle.location[0] += particle.velocity[0]
         particle.location[1] += particle.velocity[1]
         particle.timer -= 0.1  # also radius
         pygame.draw.circle(screen, (255, 255, 255), particle.location, particle.timer)
+        particle.velocity[1] += 0.1  # gravity
         if particle.timer <= 0:
             particles.remove(particle)
 
