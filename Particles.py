@@ -30,8 +30,11 @@ while True:
         particle.timer -= 0.1  # also radius
         pygame.draw.circle(screen, (255, 255, 255), particle.location, particle.timer)
         particle.velocity[1] += 0.1  # gravity
-        if particle.timer <= 0:
-            particles.remove(particle)
+
+    # remove from a list outside main loop to avoid screen flickering
+    for i, p in sorted(enumerate(particles), key=lambda k: k[1].timer, reverse=True):
+        if p.timer <= 0:
+            particles.pop(i)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
