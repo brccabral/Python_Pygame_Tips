@@ -2,7 +2,7 @@ import random
 import pygame
 import sys
 
-TILE_SIZE = 16
+TILE_SIZE = 20
 
 pygame.init()
 screen = pygame.display.set_mode((500, 500), 0, 32)
@@ -37,12 +37,12 @@ clicking = False
 while True:
     screen.fill((0, 0, 0))
 
-    mouse_pos = pygame.mouse.get_pos()
+    mx, my = pygame.mouse.get_pos()
 
     if clicking:
         particles.append(
             Particle(
-                [mouse_pos[0], mouse_pos[1]],
+                [mx, my],
                 [random.randint(0, 42) / 6 - 3.5, random.randint(0, 42) / 6 - 3.5],
                 random.randint(4, 6),
             )
@@ -50,10 +50,24 @@ while True:
 
     to_remove = []
     for i, particle in enumerate(particles):
+        # horizontal collision
         particle.location[0] += particle.velocity[0]
+        loc_str = str(int(particle.location[0] / TILE_SIZE)) + ";" + str(int(particle.location[1] / TILE_SIZE))
+        if loc_str in tile_map:
+            particle.velocity[0] = -0.7 * particle.velocity[0]
+            particle.velocity[1] *= 0.95
+            particle.location[0] += particle.velocity[0] * 2
+
+        # vertical collision
         particle.location[1] += particle.velocity[1]
-        particle.timer -= 0.05  # also radius
-        particle.velocity[1] += 0.1  # gravity
+        loc_str = str(int(particle.location[0] / TILE_SIZE)) + ";" + str(int(particle.location[1] / TILE_SIZE))
+        if loc_str in tile_map:
+            particle.velocity[1] = -0.7 * particle.velocity[1]
+            particle.velocity[0] *= 0.95
+            particle.location[1] += particle.velocity[1] * 2
+
+        particle.timer -= 0.035  # also radius
+        particle.velocity[1] += 0.15  # gravity
         pygame.draw.circle(screen, (255, 255, 255), particle.location, particle.timer)
         if particle.timer <= 0:
             to_remove.append(i)
