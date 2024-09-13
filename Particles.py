@@ -8,21 +8,29 @@ pygame.display.set_caption("Particles")
 
 mainClock = pygame.time.Clock()
 
+
+class Particle:
+    def __init__(self, location: list[float], velocity: list[float], timer: float):
+        self.location = location
+        self.velocity = velocity
+        self.timer = timer
+
+
 # [loc, velocity, timer] - timer is also radius
-particles = []
+particles: list[Particle] = []
 
 while True:
     screen.fill((0, 0, 0))
 
-    particles.append([[250, 250], [random.randint(0, 20) / 10 - 1, -2], random.randint(4, 6)])
+    particles.append(Particle([250, 250], [random.randint(0, 20) / 10 - 1, -2], random.randint(4, 6)))
 
     for particle in particles:
         # [loc, velocity, timer] - timer is also radius
-        particle[0][0] += particle[1][0]
-        particle[0][1] += particle[1][1]
-        particle[2] -= 0.1  # also radius
-        pygame.draw.circle(screen, (255, 255, 255), particle[0], particle[2])
-        if particle[2] <= 0:
+        particle.location[0] += particle.velocity[0]
+        particle.location[1] += particle.velocity[1]
+        particle.timer -= 0.1  # also radius
+        pygame.draw.circle(screen, (255, 255, 255), particle.location, particle.timer)
+        if particle.timer <= 0:
             particles.remove(particle)
 
     for event in pygame.event.get():
