@@ -217,22 +217,27 @@ while True:
             vertical_momentum = -8
         jumper.loc = (jumper.loc[0] - 0.2, jumper.loc[1])
 
+    # Rect of what is the current chunk (what will be shown on screen)
+    display_rect = pygame.Rect(scroll[0], scroll[1], display.get_width(), display.get_height())
+
     for enemy_y_speed, enemy in enemies:
-        enemy_y_speed += 0.2
-        if enemy_y_speed > 3:
-            enemy_y_speed = 3
-        enemy_movement = [0, enemy_y_speed]
-        if player.x > enemy.x + 5:
-            enemy_movement[0] = 1
-        if player.x < enemy.x - 5:
-            enemy_movement[0] = -1
         # if we move far away from enemy, tile_rects won't be in the same chunk and the enemies
         # will fall and won't be visible anymore
-        collision_types = enemy.move(enemy_movement, tile_rects)
-        if collision_types.bottom:
-            enemy_y_speed = 0
+        # only process enemies if they are in the display chunk
+        if enemy.obj.rect.colliderect(display_rect):
+            enemy_y_speed += 0.2
+            if enemy_y_speed > 3:
+                enemy_y_speed = 3
+            enemy_movement = [0, enemy_y_speed]
+            if player.x > enemy.x + 5:
+                enemy_movement[0] = 1
+            if player.x < enemy.x - 5:
+                enemy_movement[0] = -1
+            collision_types = enemy.move(enemy_movement, tile_rects)
+            if collision_types.bottom:
+                enemy_y_speed = 0
 
-        enemy.display(display, scroll)
+            enemy.display(display, scroll)
 
         if player.obj.rect.colliderect(enemy.obj.rect):
             vertical_momentum = -4
