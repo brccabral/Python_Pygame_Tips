@@ -40,13 +40,14 @@ while True:
     mx, my = pygame.mouse.get_pos()
 
     if clicking:
-        particles.append(
-            Particle(
-                [mx, my],
-                [random.randint(0, 42) / 6 - 3.5, random.randint(0, 42) / 6 - 3.5],
-                random.randint(4, 6),
+        for i in range(30):
+            particles.append(
+                Particle(
+                    [mx, my],
+                    [random.randint(0, 42) / 6 - 3.5, random.randint(0, 42) / 6 - 3.5],
+                    random.randint(4, 6),
+                )
             )
-        )
 
     to_remove = []
     for i, particle in enumerate(particles):
