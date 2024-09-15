@@ -19,7 +19,6 @@ def clip(surf: pygame.Surface, x: int, y: int, x_size: int, y_size: int):
     return image.copy()
 
 
-# Init ------------------------------------------------------- #
 class Font:
     def __init__(self, path: str):
         self.spacing = 1
@@ -42,17 +41,33 @@ class Font:
             # so, if we see gray value, it is the end of the char
             if c.r == 127:
                 char_img = clip(font_img, x - current_char_width, 0, current_char_width, font_img.get_height())
+                char_img.set_colorkey((0, 0, 0))
                 self.characters[self.character_order[character_count]] = char_img
                 character_count += 1
                 current_char_width = 0
             else:
                 current_char_width += 1
+        self.space_width = self.characters["A"].get_width()
+
+    def render(self, surf: pygame.Surface, text: str, loc: tuple[int, int]):
+        x_ofset = 0
+        for char in text:
+            if char != " ":
+                surf.blit(self.characters[char], (loc[0] + x_ofset, loc[1]))
+                x_ofset += self.characters[char].get_width() + self.spacing
+            else:
+                x_ofset += self.space_width + self.spacing
+
+
+small_font = Font("small_font.png")
 
 # Loop ------------------------------------------------------- #
 while True:
 
     # Background --------------------------------------------- #
-    screen.fill((0, 0, 0))
+    screen.fill((0, 255, 0))
+
+    small_font.render(screen, "Hello, World!", (20, 20))
 
     # Buttons ------------------------------------------------ #
     for event in pygame.event.get():
