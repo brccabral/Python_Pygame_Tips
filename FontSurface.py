@@ -20,11 +20,33 @@ def clip(surf: pygame.Surface, x: int, y: int, x_size: int, y_size: int):
 
 
 # Init ------------------------------------------------------- #
-
-# ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',\
-# 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','.',
-# '-',',',':','+','\'','!','?','0','1','2','3','4','5','6','7','8','9','(',')','/','_','=','\\','[',']','*',
-# '"','<','>',';']
+class Font:
+    def __init__(self, path: str):
+        self.spacing = 1
+        # fmt: off
+        # order as presented in image
+        self.character_order = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+                                'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd',
+                                'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
+                                't', 'u', 'v', 'w', 'x', 'y', 'z', '.', '-', ',', ':', '+', '\'', '!', '?',
+                                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')', '/', '_', '=',
+                                '\\', '[', ']', '*', '"', '<', '>', ';']
+        # fmt: on
+        font_img = pygame.image.load(path).convert()
+        current_char_width = 0
+        self.characters: dict[str, pygame.Surface] = {}
+        character_count = 0
+        for x in range(font_img.get_width()):
+            c = font_img.get_at((x, 0))
+            # from the image we see that each char is separated by gray bars
+            # so, if we see gray value, it is the end of the char
+            if c.r == 127:
+                char_img = clip(font_img, x - current_char_width, 0, current_char_width, font_img.get_height())
+                self.characters[self.character_order[character_count]] = char_img
+                character_count += 1
+                current_char_width = 0
+            else:
+                current_char_width += 1
 
 # Loop ------------------------------------------------------- #
 while True:
