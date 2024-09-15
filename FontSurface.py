@@ -60,6 +60,7 @@ class Font:
 
 
 small_font = Font("small_font.png")
+large_font = Font("large_font.png")
 
 # Loop ------------------------------------------------------- #
 while True:
@@ -68,6 +69,7 @@ while True:
     screen.fill((0, 255, 0))
 
     small_font.render(screen, "Hello, World!", (20, 20))
+    large_font.render(screen, "Hello, World!", (20, 40))
 
     # Buttons ------------------------------------------------ #
     for event in pygame.event.get():
