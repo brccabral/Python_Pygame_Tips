@@ -14,13 +14,19 @@ tree_img.set_colorkey((0, 0, 0))
 
 # be careful with performance in a game loop
 def palette_swap(surf: pygame.Surface, olc_c: pygame.Color, new_c: pygame.Color):
+    # create a new Surface with new color as background
     img_copy = pygame.Surface(surf.get_size())
     img_copy.fill(new_c)
+    # change the color key of input surface
+    # if surf already had a clolorkey, it will be replaced here (will change in the global scope)
     surf.set_colorkey(olc_c)
+    # when blit the surf into the new Surface, the background with the new color will
+    # fill the space of the new colorkey
     img_copy.blit(surf, (0, 0))
     return img_copy
 
 
+# copy the original image to avoid replacing the colorkey
 swap_img = tree_img.copy()
 swap_img = palette_swap(swap_img, pygame.Color(11, 70, 97), pygame.Color(17, 11, 96))
 swap_img = palette_swap(swap_img, pygame.Color(15, 106, 99), pygame.Color(83, 32, 145))
