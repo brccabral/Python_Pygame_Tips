@@ -139,6 +139,11 @@ while True:
     scroll[0] = int(scroll[0])
     scroll[1] = int(scroll[1])
 
+    # move scroll to apply screen shake effect
+    if screen_shake:
+        scroll[0] += random.randint(0, 8) - 4
+        scroll[1] += random.randint(0, 8) - 4
+
     # horizon background
     pygame.draw.rect(display, (7, 80, 75), pygame.Rect(0, 120, 300, 80))
 
@@ -272,15 +277,8 @@ while True:
     if screen_shake > 0:
         screen_shake -= 1
 
-    # this is a dirty solution because we may display pixels on the borders that maybe
-    # are not intended to be seen
-    render_offset = [0, 0]
-    if screen_shake:
-        render_offset[0] = random.randint(0, 8) - 4
-        render_offset[1] = random.randint(0, 8) - 4
-
     # d = pygame.font.Font().render(f"{len(game_map)=}", False, "black")
     # display.blit(d, (20, 20))
-    screen.blit(pygame.transform.scale(display, WINDOW_SIZE), render_offset)
+    screen.blit(pygame.transform.scale(display, WINDOW_SIZE))
     pygame.display.update()
     clock.tick(60)
