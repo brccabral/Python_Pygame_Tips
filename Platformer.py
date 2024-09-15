@@ -3,7 +3,7 @@ import data.engine as e
 import random
 import sys
 import pygame
-from pygame.locals import QUIT, KEYDOWN, KEYUP, K_RIGHT, K_LEFT, K_UP, K_w, K_e
+from pygame.locals import QUIT, KEYDOWN, KEYUP, K_RIGHT, K_LEFT, K_UP, K_w, K_e, K_LSHIFT
 
 # pre_init the mixer to avoid delay when we play sound effects (jump.play())
 pygame.mixer.pre_init(44100, -16, 2, 512)
@@ -122,6 +122,8 @@ jumper_objects: list[jumper_obj] = []
 for i in range(5):
     jumper_objects.append(jumper_obj((random.randint(0, 600) - 300, 80)))
 
+
+screen_shake = 0
 
 while True:
     display.fill((146, 244, 255))
@@ -259,14 +261,26 @@ while True:
                 if air_timer < 6:  # 5 frames to vertical_momentum gets to 1 (0.2 * 5)
                     jump_sound.play()
                     vertical_momentum = -5
+            if event.key == K_LSHIFT:
+                screen_shake = 20
         if event.type == KEYUP:
             if event.key == K_RIGHT:
                 moving_right = False
             if event.key == K_LEFT:
                 moving_left = False
 
+    if screen_shake > 0:
+        screen_shake -= 1
+
+    # this is a dirty solution because we may display pixels on the borders that maybe
+    # are not intended to be seen
+    render_offset = [0, 0]
+    if screen_shake:
+        render_offset[0] = random.randint(0, 8) - 4
+        render_offset[1] = random.randint(0, 8) - 4
+
     # d = pygame.font.Font().render(f"{len(game_map)=}", False, "black")
     # display.blit(d, (20, 20))
-    screen.blit(pygame.transform.scale(display, WINDOW_SIZE))
+    screen.blit(pygame.transform.scale(display, WINDOW_SIZE), render_offset)
     pygame.display.update()
     clock.tick(60)
