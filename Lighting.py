@@ -11,6 +11,13 @@ pygame.display.set_caption("Particles")
 mainClock = pygame.time.Clock()
 
 
+def circle_surf(radius: float, color: pygame.Color):
+    surf = pygame.Surface((radius * 2, radius * 2))
+    pygame.draw.circle(surf, color, (radius, radius), radius)
+    surf.set_colorkey((0, 0, 0))
+    return surf
+
+
 class Particle:
     def __init__(self, location: list[float], velocity: list[float], timer: float):
         self.location = location
@@ -46,6 +53,15 @@ while True:
         particle.timer -= 0.1  # also radius
         particle.velocity[1] += 0.15  # gravity
         pygame.draw.circle(screen, (255, 255, 255), particle.location, particle.timer)
+
+        radius = particle.timer * 2
+        # Blen a Dark Gray shape to give a glow effect
+        screen.blit(
+            circle_surf(radius, pygame.Color(20, 20, 20)),
+            (particle.location[0] - radius, particle.location[1] - radius),
+            special_flags=pygame.BLEND_RGB_ADD,
+        )
+
         if particle.timer <= 0:
             to_remove.append(i)
 
