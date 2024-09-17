@@ -13,6 +13,10 @@ img = pygame.image.load("player.png").convert()
 
 offset = [0, 0]
 
+clicking = False
+right_clicking = False
+middle_click = False
+
 # Loop ------------------------------------------------------- #
 while True:
 
@@ -23,10 +27,16 @@ while True:
 
     rot = 0
     loc = [mx, my]
+    if clicking:
+        rot -= 90
+    if right_clicking:
+        rot += 180
+    if middle_click:
+        rot += 90
     screen.blit(pygame.transform.rotate(img, rot), (loc[0] + offset[0], loc[1] + offset[1]))
 
     # Buttons ------------------------------------------------ #
-    right_clicking = False
+    right_clicking = False  # right click is check for each frame
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -35,6 +45,20 @@ while True:
             if event.key == pygame.K_ESCAPE:
                 pygame.quit()
                 sys.exit()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                clicking = True
+            if event.button == 3:
+                right_clicking = True
+            if event.button == 2:
+                middle_click = not middle_click  # middle_click works as a toggle
+            if event.button == 4:  # scroll up
+                offset[1] -= 10
+            if event.button == 5:  # scroll down
+                offset[1] += 10
+        if event.type == pygame.MOUSEBUTTONUP:
+            if event.button == 1:
+                clicking = False
 
     # Update ------------------------------------------------- #
     pygame.display.update()
