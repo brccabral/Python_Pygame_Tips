@@ -55,9 +55,9 @@ while True:
         pygame.draw.circle(screen, (255, 255, 255), particle.location, particle.timer)
 
         radius = particle.timer * 2
-        # Blen a Dark Gray shape to give a glow effect
+        # Blen a Dark Gray shape to give a glow effect (we can change the color for different glows)
         screen.blit(
-            circle_surf(radius, pygame.Color(20, 20, 20)),
+            circle_surf(radius, pygame.Color(20, 20, 60)),
             (particle.location[0] - radius, particle.location[1] - radius),
             special_flags=pygame.BLEND_RGB_ADD,
         )
