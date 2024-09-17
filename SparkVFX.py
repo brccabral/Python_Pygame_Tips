@@ -17,7 +17,7 @@ class Spark:
     def __init__(self, loc, angle, speed, color, scale=1):
         self.loc = loc
         self.angle = angle
-        self.speed = speed
+        self.speed = speed  # more speed, larger the spark
         self.scale = scale
         self.color = color
         self.alive = True
@@ -50,9 +50,9 @@ class Spark:
         self.loc[1] += movement[1]
 
         # a bunch of options to mess around with relating to angles...
-        # self.point_towards(math.pi / 2, 0.02)
-        # self.velocity_adjust(0.975, 0.2, 8, dt)
-        # self.angle += 0.1
+        # self.point_towards(math.pi / 2, 0.02)  # adds gravity 1
+        # self.velocity_adjust(0.975, 0.2, 8, dt)  # adds gravity 2
+        # self.angle += 0.1  # adds rotation
 
         self.speed -= 0.1
 
@@ -61,6 +61,7 @@ class Spark:
 
     def draw(self, surf, offset=[0, 0]):
         if self.alive:
+            # 4 points in a diamond shape
             points = [
                 [
                     self.loc[0] + math.cos(self.angle) * self.speed * self.scale,
@@ -95,7 +96,7 @@ while True:
             sparks.pop(i)
 
     mx, my = pygame.mouse.get_pos()
-    for i in range(10):
+    for i in range(10):  # adds more sparks per frame
         sparks.append(Spark([mx, my], math.radians(random.randint(0, 360)), random.randint(3, 6), (255, 255, 255), 2))
 
     # Buttons ------------------------------------------------ #
