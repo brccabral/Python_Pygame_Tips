@@ -5,6 +5,9 @@ import sys
 import pygame
 from pygame.locals import QUIT, KEYDOWN, KEYUP, K_RIGHT, K_LEFT, K_UP, K_w, K_e, K_LSHIFT
 
+# pip install noise
+import noise
+
 # pre_init the mixer to avoid delay when we play sound effects (jump.play())
 pygame.mixer.pre_init(44100, -16, 2, 512)
 pygame.init()
@@ -59,11 +62,16 @@ def generate_chunk(x: int, y: int):
             target_x = x * CHUNK_SIZE + x_pos
             target_y = y * CHUNK_SIZE + y_pos
             tile_type = 0  # nothing
-            if target_y > 10:
+
+            # noise
+            height = int(noise.pnoise1(target_x * 0.1, repeat=9999999) * 5)
+            n_height = 8 - height
+
+            if target_y > n_height:
                 tile_type = 2  # dirt
-            elif target_y == 10:
+            elif target_y == n_height:
                 tile_type = 1  # grass
-            elif target_y == 9:
+            elif target_y == n_height - 1:
                 if random.randint(1, 5) == 1:
                     tile_type = 3  # plant
             if tile_type != 0:
