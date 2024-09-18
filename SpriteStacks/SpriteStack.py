@@ -12,6 +12,9 @@ images = [pygame.image.load("car/" + img) for img in os.listdir("car")]
 clock = pygame.time.Clock()
 
 
+# for performance, it is better to calculate all rotations on game load
+# and cache them (in dictionary).
+# 90 different angles are good for pixelart games
 def render_stack(
     surf: pygame.Surface,
     images: list[pygame.Surface],
