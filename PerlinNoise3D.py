@@ -21,6 +21,33 @@ def offset_polygon(polygon: list[list[float]], offset: list[float]):
         point[2] += offset[2]
 
 
+def rotate_x(polygon: list[list[float]], amount: float):
+    for point in polygon:
+        angle = math.atan2(point[1], point[2])
+        angle += amount
+        dis = math.sqrt(point[1] ** 2 + point[2] ** 2)
+        point[1] = math.sin(angle) * dis
+        point[2] = math.cos(angle) * dis
+
+
+def rotate_y(polygon: list[list[float]], amount: float):
+    for point in polygon:
+        angle = math.atan2(point[0], point[2])
+        angle += amount
+        dis = math.sqrt(point[0] ** 2 + point[2] ** 2)
+        point[0] = math.sin(angle) * dis
+        point[2] = math.cos(angle) * dis
+
+
+def rotate_z(polygon: list[list[float]], amount: float):
+    for point in polygon:
+        angle = math.atan2(point[1], point[0])
+        angle += amount
+        dis = math.sqrt(point[1] ** 2 + point[0] ** 2)
+        point[1] = math.sin(angle) * dis
+        point[0] = math.cos(angle) * dis
+
+
 def project_polygon(polygon: list[list[float]]):
     projected_points: list[list[float]] = []
     for point in polygon:
@@ -34,13 +61,16 @@ def project_polygon(polygon: list[list[float]]):
 
 def gen_polygon(polygon_base: list[list[float]], polygon_data: dict[str, list[float]]):
     generated_polygon = deepcopy(polygon_base)
+    rotate_x(generated_polygon, polygon_data["rot"][0])
+    rotate_y(generated_polygon, polygon_data["rot"][1])
+    rotate_z(generated_polygon, polygon_data["rot"][2])
     offset_polygon(generated_polygon, polygon_data["pos"])
     return project_polygon(generated_polygon)
 
 
 poly_data: dict[str, list[float]] = {
     "pos": [0, 0, 4.5],
-    "rot": [0, 0, 0],
+    "rot": [0, 0.5, 0],
 }
 
 square_polygon = [
