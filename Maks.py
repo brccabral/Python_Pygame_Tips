@@ -21,11 +21,14 @@ img_loc = (50, 50)
 # setcolor = set the Mask main color (default is white)
 mask = pygame.mask.from_surface(img)
 # mask_surf = mask.to_surface(unsetcolor=(0, 0, 0, 0), setcolor=(0, 0, 100, 255))
-mask_surf = mask.to_surface(unsetcolor=(0, 0, 100, 100), setcolor=(100, 0, 0, 100))
+mask_surf = mask.to_surface(unsetcolor=(0, 0, 0, 0), setcolor=(255, 255, 255, 255))
 mask_2 = pygame.mask.from_surface(img_2)
-mask_2_surf = mask_2.to_surface(unsetcolor=(0, 0, 100, 100), setcolor=(100, 0, 0, 100))
+# mask_2_surf = mask_2.to_surface(unsetcolor=(0, 0, 100, 100), setcolor=(100, 0, 0, 100))
+mask_2_surf = mask_2.to_surface(unsetcolor=(0, 0, 0, 0), setcolor=(255, 255, 255, 255))
 
 show_masks = False
+
+outline = [(p[0] + img_loc[0], p[1] + img_loc[1]) for p in mask.outline()]
 
 while True:
     screen.fill((24, 24, 24))
@@ -38,6 +41,7 @@ while True:
     else:
         screen.blit(mask_surf, img_loc)
         screen.blit(mask_2_surf, (mx, my))
+        pygame.draw.lines(screen, (255, 0, 255), False, outline, 3)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
