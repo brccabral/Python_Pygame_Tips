@@ -28,7 +28,8 @@ mask_2_surf = mask_2.to_surface(unsetcolor=(0, 0, 0, 0), setcolor=(255, 255, 255
 
 show_masks = False
 
-outline = [(p[0] + img_loc[0], p[1] + img_loc[1]) for p in mask.outline()]
+# every = skips some points, may be used to improve performance
+outline = [(p[0] + img_loc[0], p[1] + img_loc[1]) for p in mask.outline(every=20)]
 
 while True:
     screen.fill((24, 24, 24))
