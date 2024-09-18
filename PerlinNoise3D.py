@@ -14,15 +14,15 @@ FOV = 90
 FOG = True
 
 
-def offset_polygon(polygon: list[list[float]], offset: tuple[float, float, float]):
+def offset_polygon(polygon: list[list[float]], offset: list[float]):
     for point in polygon:
         point[0] += offset[0]
         point[1] += offset[1]
         point[2] += offset[2]
 
 
-def project_polygon(polygon):
-    projected_points = []
+def project_polygon(polygon: list[list[float]]):
+    projected_points: list[list[float]] = []
     for point in polygon:
         x_angle = math.atan2(point[0], point[2])
         y_angle = math.atan2(point[1], point[2])
@@ -32,13 +32,13 @@ def project_polygon(polygon):
     return projected_points
 
 
-def gen_polygon(polygon_base, polygon_data):
+def gen_polygon(polygon_base: list[list[float]], polygon_data: dict[str, list[float]]):
     generated_polygon = deepcopy(polygon_base)
     offset_polygon(generated_polygon, polygon_data["pos"])
     return project_polygon(generated_polygon)
 
 
-poly_data = {
+poly_data: dict[str, list[float]] = {
     "pos": [0, 0, 4.5],
     "rot": [0, 0, 0],
 }
@@ -50,10 +50,10 @@ square_polygon = [
     [-0.5, 0.5, 0.5],
 ]
 
-polygons = []
+polygons: list[tuple[list[list[float]], pygame.Color]] = []
 
 
-def generate_poly_row(y):
+def generate_poly_row(y: float):
     global polygons
     # there are 30 "rectangles" in a row
     for x in range(30):
@@ -62,16 +62,18 @@ def generate_poly_row(y):
         poly_copy = deepcopy(square_polygon)
 
         # offset it to the correct position
-        offset_polygon(poly_copy, (x - 15, 5, y + 5))
+        offset_polygon(poly_copy, [x - 15, 5, y + 5])
 
         # some variables for keeping track of water
         water = True
-        depth = 0
+        depth = 0.0
 
         # adjust corner height based on the value from the noise at the corner's location (limit lowest value and replace with water)
+        v = 0
+        v2 = 0
         for corner in poly_copy:
-            v = noise.pnoise2(corner[0] / 10, corner[2] / 10, octaves=2) * 3
-            v2 = noise.pnoise2(corner[0] / 30 + 1000, corner[2] / 30)
+            v = int(noise.pnoise2(corner[0] / 10, corner[2] / 10, octaves=2) * 3.0)
+            v2 = int(noise.pnoise2(corner[0] / 30 + 1000, corner[2] / 30))
             if v < 0:
                 depth -= v
                 v = 0
@@ -81,12 +83,12 @@ def generate_poly_row(y):
 
         # handle coloring
         if water:
-            c = (0, min(255, max(0, 150 - depth * 25)), min(255, max(0, 255 - depth * 25)))
+            c = pygame.Color(0, int(min(255, max(0, 150 - depth * 25))), int(min(255, max(0, 255 - depth * 25))))
         else:
-            c = (30 - v * 10 + v2 * 30, 50 + v2 * 40 + v * 30, 50 + v * 10)
+            c = pygame.Color(int(30 - v * 10 + v2 * 30), int(50 + v2 * 40 + v * 30), int(50 + v * 10))
 
         # add polygon to front of list
-        polygons = [[poly_copy, c]] + polygons
+        polygons = [(poly_copy, c)] + polygons
 
 
 next_row = 0
@@ -97,8 +99,8 @@ for y in range(26):
 noise_surf = pygame.Surface((100, 100))
 for x in range(100):
     for y in range(100):
-        v = noise.pnoise2(x / 30, y / 30)
-        v = (v + 1) / 2
+        v = int(noise.pnoise2(x / 30, y / 30))
+        v = (v + 1) // 2
         noise_surf.set_at((x, y), (v * 255, v * 255, v * 255))
 
 while True:
@@ -133,7 +135,11 @@ while True:
         if d < 5:
             pygame.draw.polygon(
                 display,
-                (min(max(0, d * 20) + 150, 255), min(max(0, d * 20) + 150, 255), min(max(0, d * 20) + 150, 255)),
+                (
+                    int(min(max(0, d * 20) + 150, 255)),
+                    int(min(max(0, d * 20) + 150, 255)),
+                    int(min(max(0, d * 20) + 150, 255)),
+                ),
                 poly2,
             )
 
