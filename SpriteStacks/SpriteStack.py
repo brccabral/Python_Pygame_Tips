@@ -11,8 +11,30 @@ images = [pygame.image.load("car/" + img) for img in os.listdir("car")]
 
 clock = pygame.time.Clock()
 
+
+def render_stack(
+    surf: pygame.Surface,
+    images: list[pygame.Surface],
+    pos: tuple[float, float],
+    rotation: float,
+    spread: int = 1,
+):
+    for i, img in enumerate(images):
+        rotated_img = pygame.transform.rotate(img, rotation)
+        surf.blit(
+            rotated_img, (pos[0] - rotated_img.get_width() // 2, pos[1] - rotated_img.get_height() // 2 - i * spread)
+        )
+
+
+# frame serves as rotation
+frame = 0
+
 while True:
     display.fill((0, 0, 0))
+
+    frame += 1
+
+    render_stack(display, images, (50, 50), frame)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
