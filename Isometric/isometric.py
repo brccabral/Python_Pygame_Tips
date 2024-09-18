@@ -1,6 +1,7 @@
 import pygame
 import sys
 import time
+import random
 
 pygame.init()
 pygame.display.set_caption("game base")
@@ -17,6 +18,7 @@ f.close()
 while True:
     display.fill((0, 0, 0))
 
+    # for larger projects need to consider draw order, filter what to draw or not
     for y, row in enumerate(map_data):
         for x, tile in enumerate(row):
             if tile:
@@ -24,9 +26,13 @@ while True:
                 # the top corner to the right corner on the image
 
                 # pygame.draw.rect(display, (255, 255, 255), pygame.Rect(x * 10, y * 10, 10, 10), 1)
+
                 # the `- y * 10` and `+ x * 5` are to offset the image position in the isometric perception (rotation)
                 # 150 and 100 are offsets for the rotation
                 display.blit(grass_img, (150 + x * 10 - y * 10, 100 + x * 5 + y * 5))
+                # `-14` is a "z" offset
+                if random.randint(0, 1):
+                    display.blit(grass_img, (150 + x * 10 - y * 10, 100 + x * 5 + y * 5 - 14))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
