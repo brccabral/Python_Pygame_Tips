@@ -22,6 +22,13 @@ while True:
     screen.fill((0, 0, 0))
 
     pygame.draw.rect(screen, colors[my_square_color], my_square)
+
+    # dead zones - the joystick does not go to 0 when we release the stick
+    if abs(motion[0]) < 0.05:
+        motion[0] = 0
+    if abs(motion[1]) < 0.05:
+        motion[1] = 0
+
     my_square.x += motion[0] * 10
     my_square.y += motion[1] * 10
 
@@ -34,6 +41,8 @@ while True:
             print(event)
         if event.type == pygame.JOYAXISMOTION:
             print(event)
+            if event.axis < 2:
+                motion[event.axis] = event.value
         if event.type == pygame.JOYHATMOTION:
             print(event)
         if event.type == pygame.QUIT:
