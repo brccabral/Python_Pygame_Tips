@@ -45,6 +45,14 @@ while True:
                 motion[event.axis] = event.value
         if event.type == pygame.JOYHATMOTION:
             print(event)
+        if event.type == pygame.JOYDEVICEADDED:
+            print(event)
+            joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
+            for joystick in joysticks:
+                print(joystick.get_name())
+        if event.type == pygame.JOYDEVICEREMOVED:
+            print(event)
+            joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
