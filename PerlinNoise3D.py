@@ -69,11 +69,11 @@ def generate_poly_row(y: float):
         depth = 0.0
 
         # adjust corner height based on the value from the noise at the corner's location (limit lowest value and replace with water)
-        v = 0
-        v2 = 0
+        v = 0.0
+        v2 = 0.0
         for corner in poly_copy:
-            v = int(noise.pnoise2(corner[0] / 10, corner[2] / 10, octaves=2) * 3.0)
-            v2 = int(noise.pnoise2(corner[0] / 30 + 1000, corner[2] / 30))
+            v = float(noise.pnoise2(corner[0] / 10, corner[2] / 10, octaves=2) * 3.0)
+            v2 = float(noise.pnoise2(corner[0] / 30 + 1000, corner[2] / 30))
             if v < 0:
                 depth -= v
                 v = 0
@@ -99,9 +99,9 @@ for y in range(26):
 noise_surf = pygame.Surface((100, 100))
 for x in range(100):
     for y in range(100):
-        v = int(noise.pnoise2(x / 30, y / 30))
+        v = float(noise.pnoise2(x / 30, y / 30))
         v = (v + 1) // 2
-        noise_surf.set_at((x, y), (v * 255, v * 255, v * 255))
+        noise_surf.set_at((x, y), (int(v * 255), int(v * 255), int(v * 255)))
 
 while True:
     bg_surf = pygame.Surface(screen.get_size())
