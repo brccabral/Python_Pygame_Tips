@@ -70,7 +70,7 @@ def gen_polygon(polygon_base: list[list[float]], polygon_data: dict[str, list[fl
 
 poly_data: dict[str, list[float]] = {
     "pos": [0, 0, 4.5],
-    "rot": [0, 0.5, 0],
+    "rot": [0, 0, 0],
 }
 
 square_polygon = [
@@ -97,16 +97,17 @@ def generate_poly_row(y: float):
         # some variables for keeping track of water
         water = True
         depth = 0.0
+        water_level = 0  # -1.0 to 1.0
 
         # adjust corner height based on the value from the noise at the corner's location (limit lowest value and replace with water)
         v = 0.0
-        v2 = 0.0
+        v2 = 0.0  # v2 is a new layer, gives different shades of green
         for corner in poly_copy:
             v = float(noise.pnoise2(corner[0] / 10, corner[2] / 10, octaves=2) * 3.0)
             v2 = float(noise.pnoise2(corner[0] / 30 + 1000, corner[2] / 30))
-            if v < 0:
+            if v < water_level:
                 depth -= v
-                v = 0
+                v = water_level
             else:
                 water = False
             corner[1] -= v * 4.5
@@ -115,6 +116,10 @@ def generate_poly_row(y: float):
         if water:
             c = pygame.Color(0, int(min(255, max(0, 150 - depth * 25))), int(min(255, max(0, 255 - depth * 25))))
         else:
+            # one layer for coloring
+            # c = pygame.Color(int(30 - v * 10), int(100 + v * 30), int(50 + v * 10))
+
+            # two layers of coloring
             c = pygame.Color(int(30 - v * 10 + v2 * 30), int(50 + v2 * 40 + v * 30), int(50 + v * 10))
 
         # add polygon to front of list
@@ -134,6 +139,7 @@ for x in range(100):
         noise_surf.set_at((x, y), (int(v * 255), int(v * 255), int(v * 255)))
 
 while True:
+    # FOG
     bg_surf = pygame.Surface(screen.get_size())
     bg_surf.fill((100, 200, 250))
     display = screen.copy()
@@ -156,6 +162,8 @@ while True:
             if (i % 90 == 0) and (i != 0) and (i < 30 * 18):
                 display.blit(bg_surf, (0, 0))
         render_poly = gen_polygon(polygon[0], poly_data)
+
+        # Clouds (are modified versions of the hills)
         poly2 = deepcopy(render_poly)
         for v in poly2:
             v[1] = 100 - v[1] * 0.2
