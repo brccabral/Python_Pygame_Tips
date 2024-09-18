@@ -26,6 +26,14 @@ while True:
     my_square.y += motion[1] * 10
 
     for event in pygame.event.get():
+        if event.type == pygame.JOYBUTTONDOWN:
+            print(event)
+        if event.type == pygame.JOYBUTTONUP:
+            print(event)
+        if event.type == pygame.JOYAXISMOTION:
+            print(event)
+        if event.type == pygame.JOYHATMOTION:
+            print(event)
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
