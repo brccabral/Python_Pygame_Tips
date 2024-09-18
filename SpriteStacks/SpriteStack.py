@@ -33,8 +33,8 @@ while True:
     display.fill((0, 0, 0))
 
     frame += 1
-
-    render_stack(display, images, (50, 50), frame)
+    # spred=1 is better, with 2 we already see gaps
+    render_stack(display, images, (50, 100), frame, spread=15)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
