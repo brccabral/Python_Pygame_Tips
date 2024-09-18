@@ -32,6 +32,7 @@ class ClothObj:
         for stick in rag["connections"]:
             self.add_stick(stick)
         self.grounded = rag["grounded"]
+        self.elasticity = 0.85  # if 1 it is a strong/hard connection, if 0.2 it becomes an elastic cord
 
     def add_stick(self, points):
         self.sticks.append([points[0], points[1], get_dis(self.points[points[0]][:2], self.points[points[1]][:2])])
@@ -45,7 +46,7 @@ class ClothObj:
                 point[3] = point[1]
                 point[0] += d_x
                 point[1] += d_y
-                point[1] += 0.05
+                point[1] += 0.05  # adds gravity
 
     def move_grounded(self, offset):
         for i, point in enumerate(self.points):
@@ -63,11 +64,11 @@ class ClothObj:
             dx = self.points[stick[1]][0] - self.points[stick[0]][0]
             dy = self.points[stick[1]][1] - self.points[stick[0]][1]
             if stick[0] not in self.grounded:
-                self.points[stick[0]][0] -= dx * mv_ratio * 0.85
-                self.points[stick[0]][1] -= dy * mv_ratio * 0.85
+                self.points[stick[0]][0] -= dx * mv_ratio * self.elasticity
+                self.points[stick[0]][1] -= dy * mv_ratio * self.elasticity
             if stick[1] not in self.grounded:
-                self.points[stick[1]][0] += dx * mv_ratio * 0.85
-                self.points[stick[1]][1] += dy * mv_ratio * 0.85
+                self.points[stick[1]][0] += dx * mv_ratio * self.elasticity
+                self.points[stick[1]][1] += dy * mv_ratio * self.elasticity
 
     def render_polygon(self, target_surf, color, offset=[0, 0]):
         y_points = [p[1] * self.scale for p in self.points]
