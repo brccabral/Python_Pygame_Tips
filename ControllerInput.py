@@ -28,6 +28,8 @@ while True:
     for event in pygame.event.get():
         if event.type == pygame.JOYBUTTONDOWN:
             print(event)
+            if event.button == 0:
+                my_square_color = (my_square_color + 1) % len(colors)
         if event.type == pygame.JOYBUTTONUP:
             print(event)
         if event.type == pygame.JOYAXISMOTION:
