@@ -14,10 +14,12 @@ img_2 = pygame.image.load("img_2.png")
 img_2.set_colorkey((0, 0, 0))
 img_loc = (50, 50)
 
+# unsetcolor = set the color of the original "alpha"
+# here we are setting to transparent (default is black)
 mask = pygame.mask.from_surface(img)
-mask_surf = mask.to_surface()
+mask_surf = mask.to_surface(unsetcolor=(0, 0, 0, 0))
 mask_2 = pygame.mask.from_surface(img_2)
-mask_2_surf = mask_2.to_surface()
+mask_2_surf = mask_2.to_surface(unsetcolor=(0, 0, 0, 0))
 
 show_masks = False
 
