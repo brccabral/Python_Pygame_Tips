@@ -29,7 +29,7 @@ mask_2_surf = mask_2.to_surface(unsetcolor=(0, 0, 0, 0), setcolor=(255, 255, 255
 show_masks = False
 
 # every = skips some points, may be used to improve performance
-outline = [(p[0] + img_loc[0], p[1] + img_loc[1]) for p in mask.outline(every=20)]
+outline = [(p[0] + img_loc[0], p[1] + img_loc[1]) for p in mask.outline(every=1)]
 
 while True:
     screen.fill((24, 24, 24))
@@ -43,6 +43,9 @@ while True:
         screen.blit(mask_surf, img_loc)
         screen.blit(mask_2_surf, (mx, my))
         pygame.draw.lines(screen, (255, 0, 255), False, outline, 3)
+
+        overlap_mask = mask.overlap_mask(mask_2, (mx - img_loc[0], my - img_loc[1]))
+        screen.blit(overlap_mask.to_surface(unsetcolor=(0, 0, 0, 0), setcolor=(255, 0, 0, 255)), img_loc)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
