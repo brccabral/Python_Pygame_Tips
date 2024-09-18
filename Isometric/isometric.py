@@ -20,7 +20,13 @@ while True:
     for y, row in enumerate(map_data):
         for x, tile in enumerate(row):
             if tile:
-                pygame.draw.rect(display, (255, 255, 255), pygame.Rect(x * 10, y * 10, 10, 10), 1)
+                # 10 and 5 are related not just the TILE_SIZE, but also the image for the tile
+                # the top corner to the right corner on the image
+
+                # pygame.draw.rect(display, (255, 255, 255), pygame.Rect(x * 10, y * 10, 10, 10), 1)
+                # the `- y * 10` and `+ x * 5` are to offset the image position in the isometric perception (rotation)
+                # 150 and 100 are offsets for the rotation
+                display.blit(grass_img, (150 + x * 10 - y * 10, 100 + x * 5 + y * 5))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
