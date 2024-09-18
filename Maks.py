@@ -10,21 +10,25 @@ clock = pygame.time.Clock()
 
 img = pygame.image.load("img.png")
 img.set_colorkey((0, 0, 0))
+# img.set_colorkey((255, 127, 39))  # the "alpha" is the orange
 img_2 = pygame.image.load("img_2.png")
 img_2.set_colorkey((0, 0, 0))
+# img_2.set_colorkey((255, 127, 39))
 img_loc = (50, 50)
 
-# unsetcolor = set the color of the original "alpha"
+# unsetcolor = set the color of the original "colorkey"
 # here we are setting to transparent (default is black)
+# setcolor = set the Mask main color (default is white)
 mask = pygame.mask.from_surface(img)
-mask_surf = mask.to_surface(unsetcolor=(0, 0, 0, 0))
+# mask_surf = mask.to_surface(unsetcolor=(0, 0, 0, 0), setcolor=(0, 0, 100, 255))
+mask_surf = mask.to_surface(unsetcolor=(0, 0, 100, 100), setcolor=(100, 0, 0, 100))
 mask_2 = pygame.mask.from_surface(img_2)
-mask_2_surf = mask_2.to_surface(unsetcolor=(0, 0, 0, 0))
+mask_2_surf = mask_2.to_surface(unsetcolor=(0, 0, 100, 100), setcolor=(100, 0, 0, 100))
 
 show_masks = False
 
 while True:
-    screen.fill((0, 0, 0))
+    screen.fill((24, 24, 24))
 
     mx, my = pygame.mouse.get_pos()
 
