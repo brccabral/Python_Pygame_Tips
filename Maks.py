@@ -47,6 +47,15 @@ while True:
         overlap_mask = mask.overlap_mask(mask_2, (mx - img_loc[0], my - img_loc[1]))
         screen.blit(overlap_mask.to_surface(unsetcolor=(0, 0, 0, 0), setcolor=(255, 0, 0, 255)), img_loc)
 
+        # overlap_centroid - is not the middle, but the average of overlaping points (mass center)
+        overlap_centroid = overlap_mask.centroid()
+        pygame.draw.circle(
+            screen, (0, 200, 255), (overlap_centroid[0] + img_loc[0], overlap_centroid[1] + img_loc[1]), 10, 3
+        )
+        pygame.draw.circle(
+            screen, (0, 200, 255), (overlap_centroid[0] + img_loc[0], overlap_centroid[1] + img_loc[1]), 3, 3
+        )
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
