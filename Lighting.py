@@ -42,7 +42,7 @@ while True:
         )
     )
 
-    to_remove = []
+    to_remove: list[int] = []
     for i, particle in enumerate(particles):
         # horizontal collision
         particle.location[0] += particle.velocity[0]

@@ -119,11 +119,11 @@ for i in range(5):
 # [depth, Rect]
 # depth makes object closer to move faster giving a parallax effect
 background_objects = [
-    [0.25, [120, 10, 70, 400]],
-    [0.25, [280, 30, 40, 400]],
-    [0.5, [30, 40, 40, 400]],
-    [0.5, [130, 90, 100, 400]],
-    [0.5, [300, 80, 120, 400]],
+    (0.25, [120, 10, 70, 400]),
+    (0.25, [280, 30, 40, 400]),
+    (0.5, [30, 40, 40, 400]),
+    (0.5, [130, 90, 100, 400]),
+    (0.5, [300, 80, 120, 400]),
 ]
 
 jumper_objects: list[jumper_obj] = []
@@ -168,7 +168,7 @@ while True:
             pygame.draw.rect(display, (9, 91, 85), obj_rect)
 
     # draw tiles
-    tile_rects = []  # collision tiles
+    tile_rects: list[pygame.Rect] = []  # collision tiles
     for y in range(VISIBLE_TILES_Y):
         for x in range(VISIBLE_TILES_X):
             target_x = x - 1 + round(scroll[0] / (CHUNK_SIZE * TILE_SIZE))
@@ -243,7 +243,7 @@ while True:
             enemy_y_speed += 0.2
             if enemy_y_speed > 3:
                 enemy_y_speed = 3
-            enemy_movement = [0, enemy_y_speed]
+            enemy_movement: list[float] = [0, enemy_y_speed]
             if player.x > enemy.x + 5:
                 enemy_movement[0] = 1
             if player.x < enemy.x - 5:

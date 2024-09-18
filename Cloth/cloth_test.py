@@ -34,7 +34,7 @@ while True:
 
     # render
     if render_mode:
-        my_cloth.render_polygon(screen, (255, 255, 255))
+        my_cloth.render_polygon(screen, pygame.Color(255, 255, 255))
     else:
         my_cloth.render_sticks(screen)
 

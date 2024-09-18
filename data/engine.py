@@ -1,9 +1,10 @@
 import pygame
 import math
 import os
+from typing import Self
 
 global e_colorkey
-e_colorkey = (255, 255, 255)
+e_colorkey = pygame.Color(255, 255, 255)
 
 global animation_database
 animation_database: dict[str, pygame.Surface] = {}
@@ -12,7 +13,7 @@ global animation_higher_database
 animation_higher_database: dict[str, dict[str, tuple[list[str], list[str]]]] = {}
 
 
-def set_global_colorkey(colorkey):
+def set_global_colorkey(colorkey: pygame.Color):
     global e_colorkey
     e_colorkey = colorkey
 
@@ -48,7 +49,7 @@ class CollisionType:
 # 2d physics object
 class physics_obj(object):
 
-    def __init__(self, x, y, x_size, y_size):
+    def __init__(self, x: int, y: int, x_size: int, y_size: int):
         self.width = x_size
         self.height = y_size
         self.rect = pygame.Rect(x, y, self.width, self.height)
@@ -98,7 +99,7 @@ class physics_obj(object):
 
 class cuboid(object):
 
-    def __init__(self, x, y, z, x_size, y_size, z_size):
+    def __init__(self, x: int, y: int, z: int, x_size: int, y_size: int, z_size: int):
         self.x = x
         self.y = y
         self.z = z
@@ -106,12 +107,12 @@ class cuboid(object):
         self.y_size = y_size
         self.z_size = z_size
 
-    def set_pos(self, x, y, z):
+    def set_pos(self, x: int, y: int, z: int):
         self.x = x
         self.y = y
         self.z = z
 
-    def collidecuboid(self, cuboid_2):
+    def collidecuboid(self, cuboid_2: Self):
         cuboid_1_xy = pygame.Rect(self.x, self.y, self.x_size, self.y_size)
         cuboid_1_yz = pygame.Rect(self.y, self.z, self.y_size, self.z_size)
         cuboid_2_xy = pygame.Rect(cuboid_2.x, cuboid_2.y, cuboid_2.x_size, cuboid_2.y_size)
@@ -125,15 +126,15 @@ class cuboid(object):
 # entity stuff
 
 
-def simple_entity(x, y, e_type):
+def simple_entity(x: int, y: int, e_type: str):
     return entity(x, y, 1, 1, e_type)
 
 
-def flip(img: pygame.Surface, boolean=True):
+def flip(img: pygame.Surface, boolean: bool = True):
     return pygame.transform.flip(img, boolean, False)
 
 
-def blit_center(surf, surf2, pos):
+def blit_center(surf: pygame.Surface, surf2: pygame.Surface, pos: tuple[float, float]):
     x = int(surf2.get_width() / 2)
     y = int(surf2.get_height() / 2)
     surf.blit(surf2, (pos[0] - x, pos[1] - y))
@@ -162,7 +163,7 @@ class entity(object):
         self.entity_data = {}
         self.alpha = None
 
-    def set_pos(self, x, y):
+    def set_pos(self, x: int, y: int):
         self.x = x
         self.y = y
         self.obj.x = x
@@ -182,14 +183,14 @@ class entity(object):
     def set_flip(self, boolean: bool):
         self.flip = boolean
 
-    def set_animation_tags(self, tags):
+    def set_animation_tags(self, tags: list[str]):
         self.animation_tags = tags
 
     def set_animation(self, sequence: list[str]):
         self.animation = sequence
         self.animation_frame = 0
 
-    def set_action(self, action_id: str, force=False):
+    def set_action(self, action_id: str, force: bool = False):
         if (self.action == action_id) and (force is False):
             pass
         else:
@@ -199,7 +200,7 @@ class entity(object):
             self.set_animation_tags(anim[1])
             self.animation_frame = 0
 
-    def get_entity_angle(self, entity_2):
+    def get_entity_angle(self, entity_2: Self):
         x1 = self.x + int(self.size_x / 2)
         y1 = self.y + int(self.size_y / 2)
         x2 = entity_2.x + int(entity_2.size_x / 2)
@@ -217,10 +218,10 @@ class entity(object):
     def clear_animation(self):
         self.animation = None
 
-    def set_image(self, image):
+    def set_image(self, image: pygame.Surface):
         self.image = image
 
-    def set_offset(self, offset):
+    def set_offset(self, offset: list[float]):
         self.offset = offset
 
     def set_frame(self, amount: int):
@@ -296,7 +297,12 @@ class entity(object):
 
 # a sequence looks like [[0,1],[1,1],[2,1],[3,1],[4,2]]
 # the first numbers are the image name(as integer), while the second number shows the duration of it in the sequence
-def animation_sequence(sequence, base_path, colorkey=(255, 255, 255), transparency=255):
+def animation_sequence(
+    sequence: list[list[int]],
+    base_path: str,
+    colorkey: pygame.Color = pygame.Color(255, 255, 255),
+    transparency: int = 255,
+):
     global animation_database
     result: list[str] = []
     for frame in sequence:
@@ -305,12 +311,12 @@ def animation_sequence(sequence, base_path, colorkey=(255, 255, 255), transparen
         image.set_colorkey(colorkey)
         image.set_alpha(transparency)
         animation_database[image_id] = image.copy()
-        for i in range(frame[1]):
+        for _ in range(frame[1]):
             result.append(image_id)
     return result
 
 
-def get_frame(ID):
+def get_frame(ID: str):
     global animation_database
     return animation_database[ID]
 
@@ -329,7 +335,7 @@ def load_animations(path: str):
         animation_id = entity_info[1]
         timings = sections[1].split(";")
         tags = sections[2].split(";")
-        sequence = []
+        sequence: list[list[int]] = []
         n = 0
         for timing in timings:
             sequence.append([n, int(timing)])
@@ -343,29 +349,29 @@ def load_animations(path: str):
 # particles
 
 
-def particle_file_sort(l):
-    l2 = []
+def particle_file_sort(l: list[str]):
+    l2: list[int] = []
     for obj in l:
         l2.append(int(obj[:-4]))
     l2.sort()
-    l3 = []
+    l3: list[str] = []
     for obj in l2:
         l3.append(str(obj) + ".png")
     return l3
 
 
 global particle_images
-particle_images = {}
+particle_images: dict[str, list[pygame.Surface]] = {}
 
 
-def load_particle_images(path):
+def load_particle_images(path: str):
     global particle_images, e_colorkey
     file_list = os.listdir(path)
     for folder in file_list:
         try:
-            img_list = os.listdir(path + "/" + folder)
+            img_list: list[str] = os.listdir(path + "/" + folder)
             img_list = particle_file_sort(img_list)
-            images = []
+            images: list[pygame.Surface] = []
             for img in img_list:
                 images.append(pygame.image.load(path + "/" + folder + "/" + img).convert())
             for img in images:
@@ -377,7 +383,16 @@ def load_particle_images(path):
 
 class particle(object):
 
-    def __init__(self, x, y, particle_type, motion, decay_rate, start_frame, custom_color=None):
+    def __init__(
+        self,
+        x: int,
+        y: int,
+        particle_type: str,
+        motion: list[float],
+        decay_rate: float,
+        start_frame: float,
+        custom_color: pygame.Color | None = None,
+    ):
         self.x = x
         self.y = y
         self.type = particle_type
@@ -386,7 +401,7 @@ class particle(object):
         self.color = custom_color
         self.frame = start_frame
 
-    def draw(self, surface, scroll):
+    def draw(self, surface: pygame.Surface, scroll: list[float]):
         global particle_images
         if self.frame > len(particle_images[self.type]) - 1:
             self.frame = len(particle_images[self.type]) - 1
@@ -395,7 +410,7 @@ class particle(object):
         else:
             blit_center(
                 surface,
-                swap_color(particle_images[self.type][int(self.frame)], (255, 255, 255), self.color),
+                swap_color(particle_images[self.type][int(self.frame)], pygame.Color(255, 255, 255), self.color),
                 (self.x - scroll[0], self.y - scroll[1]),
             )
 
@@ -412,7 +427,7 @@ class particle(object):
 # other useful functions
 
 
-def swap_color(img, old_c, new_c):
+def swap_color(img: pygame.Surface, old_c: pygame.Color, new_c: pygame.Color):
     global e_colorkey
     img.set_colorkey(old_c)
     surf = img.copy()

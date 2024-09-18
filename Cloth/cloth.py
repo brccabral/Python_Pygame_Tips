@@ -4,20 +4,20 @@ import math
 import pygame
 
 
-def read_json(path):
+def read_json(path: str) -> dict[str, list[int]]:
     f = open(path, "r")
     dat = f.read()
     f.close()
     return json.loads(dat)
 
 
-def get_dis(p1, p2):
+def get_dis(p1: list[float], p2: list[float]):
     return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
 
 
-def load_rags(path):
+def load_rags(path: str):
     rag_list = os.listdir(path)
-    rags = {}
+    rags: dict[str, dict[str, list[int]]] = {}
     for rag in rag_list:
         rags[rag.split(".")[0]] = read_json(path + "/" + rag)
     return rags
@@ -25,17 +25,17 @@ def load_rags(path):
 
 class ClothObj:
     def __init__(self, rag):
-        self.points = [p + p for p in rag["points"]]  # dupe position for last position
-        self.orig_points = [p + p for p in rag["points"]]
-        self.sticks = []
-        self.scale = rag["scale"]
+        self.points: list[list[float]] = [p + p for p in rag["points"]]  # dupe position for last position
+        self.orig_points: list[list[float]] = [p + p for p in rag["points"]]
+        self.sticks: list[tuple[int, int, float]] = []
+        self.scale: float = rag["scale"]
         for stick in rag["connections"]:
             self.add_stick(stick)
-        self.grounded = rag["grounded"]
+        self.grounded: list[float] = rag["grounded"]
         self.elasticity = 0.85  # if 1 it is a strong/hard connection, if 0.2 it becomes an elastic cord
 
-    def add_stick(self, points):
-        self.sticks.append([points[0], points[1], get_dis(self.points[points[0]][:2], self.points[points[1]][:2])])
+    def add_stick(self, points: list[int]):
+        self.sticks.append((points[0], points[1], get_dis(self.points[points[0]][:2], self.points[points[1]][:2])))
 
     def update(self):
         for i, point in enumerate(self.points):
@@ -48,7 +48,7 @@ class ClothObj:
                 point[1] += d_y
                 point[1] += 0.05  # adds gravity
 
-    def move_grounded(self, offset):
+    def move_grounded(self, offset: list[int]):
         for i, point in enumerate(self.points):
             if i in self.grounded:
                 point[0] = self.orig_points[i][0] + offset[0] / self.scale
@@ -70,7 +70,7 @@ class ClothObj:
                 self.points[stick[1]][0] += dx * mv_ratio * self.elasticity
                 self.points[stick[1]][1] += dy * mv_ratio * self.elasticity
 
-    def render_polygon(self, target_surf, color, offset=[0, 0]):
+    def render_polygon(self, target_surf: pygame.Surface, color: pygame.Color, offset: tuple[float, float] = (0, 0)):
         y_points = [p[1] * self.scale for p in self.points]
         x_points = [p[0] * self.scale for p in self.points]
         min_x = min(x_points)
@@ -89,7 +89,7 @@ class ClothObj:
         pygame.draw.polygon(surf, color, outline)
         target_surf.blit(surf, (min_x - offset[0], min_y - offset[1]))
 
-    def render_sticks(self, surf, offset=[0, 0]):
+    def render_sticks(self, surf: pygame.Surface, offset: tuple[float, float] = (0, 0)):
         render_points = [[p[0] * self.scale - offset[0], p[1] * self.scale - offset[1]] for p in self.points]
         for stick in self.sticks:
             pygame.draw.line(surf, (255, 255, 255), render_points[stick[0]], render_points[stick[1]], 1)
