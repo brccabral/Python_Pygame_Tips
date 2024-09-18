@@ -56,6 +56,12 @@ while True:
             screen, (0, 200, 255), (overlap_centroid[0] + img_loc[0], overlap_centroid[1] + img_loc[1]), 3, 3
         )
 
+        # area is faster than count
+        print(f"count {overlap_mask.count()}")
+        print(f"area {mask.overlap_area(mask_2, (mx - img_loc[0], my - img_loc[1]))}")
+        # to detect if there is a overlap, getting just the first point is even faster
+        print(f"First point {mask.overlap(mask, (mx - img_loc[0], my - img_loc[1]))}")
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
